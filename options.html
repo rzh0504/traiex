@@ -1,0 +1,243 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png" />
+    <link rel="stylesheet" href="css/options.css" />
+    <title>traiex 设置</title>
+  </head>
+  <body>
+    <main>
+      <div class="settings-container">
+        <header>
+          <h1>traiex</h1>
+          <p class="subtitle">settings</p>
+        </header>
+
+        <form id="settings-form">
+          <!-- 显示设置 -->
+          <section class="settings-section">
+            <h2 data-i18n="display">显示</h2>
+
+            <div class="setting-item">
+              <div class="setting-info">
+                <label for="language" data-i18n="language">界面语言</label>
+                <span class="setting-description" data-i18n="language_desc">选择界面和时间显示的语言</span>
+              </div>
+              <select id="language">
+                <option value="zh-CN">中文</option>
+                <option value="en">English</option>
+              </select>
+            </div>
+
+            <div class="setting-item">
+              <div class="setting-info">
+                <label for="showDateTime" data-i18n="show_datetime">显示时间日期</label>
+                <span class="setting-description" data-i18n="show_datetime_desc">在页面顶部显示当前时间和日期</span>
+              </div>
+              <label class="toggle">
+                <input type="checkbox" id="showDateTime" checked />
+                <span class="slider"></span>
+              </label>
+            </div>
+
+            <div class="setting-item">
+              <div class="setting-info">
+                <label for="showDock" data-i18n="show_dock">显示 Dock</label>
+                <span class="setting-description" data-i18n="show_dock_desc">显示快捷链接图标栏</span>
+              </div>
+              <label class="toggle">
+                <input type="checkbox" id="showDock" checked />
+                <span class="slider"></span>
+              </label>
+            </div>
+
+            <div class="setting-item">
+              <div class="setting-info">
+                <label for="showBookmarks" data-i18n="show_bookmarks">显示书签</label>
+                <span class="setting-description" data-i18n="show_bookmarks_desc">显示书签链接列表</span>
+              </div>
+              <label class="toggle">
+                <input type="checkbox" id="showBookmarks" checked />
+                <span class="slider"></span>
+              </label>
+            </div>
+          </section>
+
+          <!-- 搜索设置 -->
+          <section class="settings-section">
+            <h2 data-i18n="search">搜索</h2>
+
+            <div class="setting-item">
+              <div class="setting-info">
+                <label for="searchEngine" data-i18n="search_engine">默认搜索引擎</label>
+                <span class="setting-description" data-i18n="search_engine_desc">选择用于搜索的引擎</span>
+              </div>
+              <select id="searchEngine">
+                <option value="google">Google</option>
+                <option value="bing">Bing</option>
+                <option value="duckduckgo">DuckDuckGo</option>
+                <option value="baidu">百度</option>
+              </select>
+            </div>
+
+            <div class="setting-item">
+              <div class="setting-info">
+                <label for="linkTarget" data-i18n="link_target">链接打开方式</label>
+                <span class="setting-description" data-i18n="link_target_desc">选择点击链接时的打开方式</span>
+              </div>
+              <select id="linkTarget">
+                <option value="_blank" data-i18n="new_tab">新标签页</option>
+                <option value="_self" data-i18n="current_tab">当前标签页</option>
+              </select>
+            </div>
+          </section>
+
+          <!-- 外观设置 -->
+          <section class="settings-section">
+            <h2 data-i18n="appearance">外观</h2>
+
+            <div class="setting-item">
+              <div class="setting-info">
+                <label for="theme" data-i18n="theme">主题模式</label>
+                <span class="setting-description" data-i18n="theme_desc">选择页面的颜色主题</span>
+              </div>
+              <select id="theme">
+                <option value="auto" data-i18n="theme_auto">跟随系统</option>
+                <option value="light" data-i18n="theme_light">浅色模式</option>
+                <option value="dark" data-i18n="theme_dark">深色模式</option>
+              </select>
+            </div>
+
+            <div class="setting-item setting-item-column" id="bgColorSection">
+              <div class="setting-info">
+                <label data-i18n="light_bg_color">浅色模式背景色</label>
+                <span class="setting-description" data-i18n="light_bg_color_desc">选择浅色模式下的背景颜色</span>
+              </div>
+              <div class="color-options">
+                <div class="color-presets">
+                  <button type="button" class="color-preset" data-color="#DDE2EF" style="background-color: #DDE2EF;" data-i18n-title="color_lavender" title="淡紫蓝 (默认)"></button>
+                  <button type="button" class="color-preset" data-color="#E8F5E9" style="background-color: #E8F5E9;" data-i18n-title="color_mint" title="薄荷绿"></button>
+                  <button type="button" class="color-preset" data-color="#FFF8E1" style="background-color: #FFF8E1;" data-i18n-title="color_cream" title="奶油黄"></button>
+                  <button type="button" class="color-preset" data-color="#FFEBEE" style="background-color: #FFEBEE;" data-i18n-title="color_cherry" title="樱花粉"></button>
+                  <button type="button" class="color-preset" data-color="#E3F2FD" style="background-color: #E3F2FD;" data-i18n-title="color_sky" title="天空蓝"></button>
+                  <button type="button" class="color-preset" data-color="#F3E5F5" style="background-color: #F3E5F5;" data-i18n-title="color_purple" title="淡紫色"></button>
+                  <button type="button" class="color-preset" data-color="#ECEFF1" style="background-color: #ECEFF1;" data-i18n-title="color_silver" title="银灰色"></button>
+                  <button type="button" class="color-preset" data-color="#FFFFFF" style="background-color: #FFFFFF;" data-i18n-title="color_white" title="纯白色"></button>
+                </div>
+                <div class="color-custom">
+                  <label for="lightBgColor" class="color-custom-label" data-i18n="custom">自定义:</label>
+                  <input type="color" id="lightBgColor" value="#DDE2EF" class="color-input">
+                  <span class="color-value" id="colorValue">#DDE2EF</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="setting-item">
+              <div class="setting-info">
+                <label for="searchBorderRadius" data-i18n="search_border_radius">搜索框圆角</label>
+                <span class="setting-description" data-i18n="search_border_radius_desc">调整搜索框的圆角大小</span>
+              </div>
+              <div class="range-control">
+                <input type="range" id="searchBorderRadius" min="0" max="50" value="8" class="range-input">
+                <span class="range-value" id="borderRadiusValue">8px</span>
+              </div>
+            </div>
+
+            <div class="setting-item">
+              <div class="setting-info">
+                <label for="bookmarksFontWeight" data-i18n="bookmarks_font_weight">书签字体粗细</label>
+                <span class="setting-description" data-i18n="bookmarks_font_weight_desc">调整书签链接的字体粗细</span>
+              </div>
+              <select id="bookmarksFontWeight">
+                <option value="550" selected data-i18n="font_regular">常规 (550)</option>
+                <option value="600" data-i18n="font_medium">中等 (600)</option>
+                <option value="700" data-i18n="font_bold">粗体 (700)</option>
+              </select>
+            </div>
+          </section>
+
+          <!-- Dock 设置 -->
+          <section class="settings-section">
+            <h2 data-i18n="dock_settings">Dock 设置</h2>
+            <div class="setting-item">
+              <div class="setting-info">
+                <label for="showDockLabels" data-i18n="show_dock_labels">显示图标标签</label>
+                <span class="setting-description" data-i18n="show_dock_labels_desc">在 Dock 图标下方显示站点名称</span>
+              </div>
+              <label class="toggle">
+                <input type="checkbox" id="showDockLabels">
+                <span class="slider"></span>
+              </label>
+            </div>
+            
+            <div class="setting-item">
+              <div class="setting-info">
+                <label data-i18n="manage_dock">管理 Dock 站点</label>
+                <span class="setting-description" data-i18n="manage_dock_desc">添加或删除 Dock 上的快捷方式。拖拽可调整顺序。</span>
+              </div>
+            </div>
+            
+            <div class="dock-manager">
+              <div id="active-dock-sites" class="active-dock-sites">
+                <!-- Javascript will populate this -->
+              </div>
+              
+              <h3 class="subsection-title" data-i18n="available_presets">可用预设</h3>
+              <div id="preset-dock-sites" class="preset-dock-sites">
+                <!-- Javascript will populate this -->
+              </div>
+            </div>
+          </section>
+
+          <!-- 书签管理 -->
+          <section class="settings-section">
+            <h2 data-i18n="bookmark_categories">书签分类</h2>
+            
+            <div class="bookmark-categories" id="bookmark-categories">
+              <!-- Categories will be rendered by JS -->
+            </div>
+          </section>
+
+          <!-- 保存按钮 -->
+          <div class="actions">
+            <button type="submit" class="save-btn">
+              <span class="btn-text" data-i18n="save_settings">保存设置</span>
+              <span class="btn-icon">✓</span>
+            </button>
+            <button type="button" class="reset-btn" id="reset-btn" data-i18n="reset_defaults">
+              恢复默认
+            </button>
+          </div>
+
+          <!-- 数据管理 -->
+          <section class="settings-section">
+            <h2 data-i18n="data_management">数据管理</h2>
+            <div class="setting-item">
+              <div class="setting-info">
+                <label data-i18n="import_export">导入/导出设置</label>
+                <span class="setting-description" data-i18n="import_export_desc">备份或恢复您的所有设置和书签</span>
+              </div>
+              <div class="import-export-btns">
+                <button type="button" class="export-btn" id="export-btn" data-i18n="export">导出</button>
+                <button type="button" class="import-btn" id="import-btn" data-i18n="import">导入</button>
+                <input type="file" id="import-file" accept=".json" style="display:none">
+              </div>
+            </div>
+          </section>
+
+          <!-- 提示消息容器将动态生成 -->
+        </form>
+      </div>
+    </main>
+
+    <div id="toast-container" class="toast-container"></div>
+    <script src="js/i18n.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/data.js"></script>
+    <script src="js/options.js"></script>
+  </body>
+</html>

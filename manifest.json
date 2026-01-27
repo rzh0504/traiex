@@ -1,0 +1,18 @@
+{
+  "manifest_version": 3,
+  "name": "traiex",
+  "version": "1.1.0",
+  "description": "A minimal and beautiful new tab page with search, bookmarks, and quick links. Customizable settings for a personalized experience.",
+  "icons": {
+    "16": "favicon-16x16.png",
+    "32": "favicon-32x32.png"
+  },
+  "chrome_url_overrides": {
+    "newtab": "index.html"
+  },
+  "options_ui": {
+    "page": "options.html",
+    "open_in_tab": true
+  },
+  "permissions": ["storage"]
+}
