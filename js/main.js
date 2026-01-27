@@ -237,6 +237,9 @@ function renderBookmarks() {
             a.appendChild(img);
             a.appendChild(document.createTextNode(bookmark.name));
             
+            // Remove focus on click/touch for mobile (CSS :focus-visible handles desktop)
+            a.addEventListener('click', function() { this.blur(); });
+            
             li.appendChild(a);
             ul.appendChild(li);
         });

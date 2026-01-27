@@ -197,15 +197,17 @@ aside svg { height: 4.5rem; }
     background-color: transparent;
     border: none;
     cursor: pointer;
+    background-image: var(--svg-search);
     background-repeat: no-repeat;
     background-position: center;
     background-size: 1.5rem 1.5rem;
     padding: 0;
     transition: opacity 0.2s;
+    opacity: 0.6;
 }
 
 #search-btn:hover {
-    opacity: 0.8;
+    opacity: 1;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -225,6 +227,11 @@ aside svg { height: 4.5rem; }
     #search input[data-engine="bing"] { background-image: var(--svg-bing); }
     #search input[data-engine="duckduckgo"] { background-image: var(--svg-ddg); }
     #search input[data-engine="baidu"] { background-image: var(--svg-baidu); }
+    
+    /* Search button icon - invert for dark mode */
+    #search-btn {
+        filter: brightness(0) invert(1);
+    }
 }
 
 @media (prefers-color-scheme: light) {
@@ -306,7 +313,7 @@ aside svg { height: 4.5rem; }
     font-weight: var(--bookmarks-font-weight, 550);
 }
 
-#bookmarks a:focus,
+#bookmarks a:focus-visible,
 #bookmarks a:hover {
     color: var(--primary-link-hover-color);
     outline: none;
@@ -402,6 +409,11 @@ aside svg { height: 4.5rem; }
 .theme-dark #search input[data-engine="bing"] { background-image: var(--svg-bing); }
 .theme-dark #search input[data-engine="duckduckgo"] { background-image: var(--svg-ddg); }
 .theme-dark #search input[data-engine="baidu"] { background-image: var(--svg-baidu); }
+
+/* Dark theme - search button icon */
+.theme-dark #search-btn {
+    filter: brightness(0) invert(1);
+}
 
 /* Settings Button - Fixed Position Bottom Right */
 .settings-btn {
