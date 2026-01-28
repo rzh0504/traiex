@@ -91,6 +91,16 @@ const translations = {
         color_silver: '银灰色',
         color_white: '纯白色',
         
+        // Search history
+        save_search_history: '保存搜索历史',
+        save_search_history_desc: '在本地保存搜索历史记录',
+        max_search_history: '历史记录数量',
+        max_search_history_desc: '最多保存的搜索历史条数',
+        search_history_cleared: '搜索历史已清除',
+        clear_search_history: '清除搜索历史',
+        clear_search_history_desc: '删除所有已保存的搜索历史',
+        clear: '清除',
+        
         // Data management
         data_management: '数据管理',
         import_export: '导入/导出设置',
@@ -185,6 +195,16 @@ const translations = {
         color_purple: 'Light Purple',
         color_silver: 'Silver Gray',
         color_white: 'Pure White',
+        
+        // Search history
+        save_search_history: 'Save Search History',
+        save_search_history_desc: 'Save search history locally',
+        max_search_history: 'History Count',
+        max_search_history_desc: 'Maximum search history items to save',
+        search_history_cleared: 'Search history cleared',
+        clear_search_history: 'Clear Search History',
+        clear_search_history_desc: 'Delete all saved search history',
+        clear: 'Clear',
         
         // Data management
         data_management: 'Data Management',

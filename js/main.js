@@ -248,17 +248,133 @@ function renderBookmarks() {
     });
 }
 
+// Search history functions
+async function getSearchHistory() {
+    try {
+        const result = await chrome.storage.local.get('searchHistory');
+        return result.searchHistory || [];
+    } catch {
+        return [];
+    }
+}
+
+async function saveSearchToHistory(query) {
+    if (!query || !currentSettings.saveSearchHistory) return;
+    
+    try {
+        let history = await getSearchHistory();
+        // Remove duplicate if exists
+        history = history.filter(item => item !== query);
+        // Add to beginning
+        history.unshift(query);
+        // Limit to maxSearchHistory
+        const maxItems = currentSettings.maxSearchHistory || 10;
+        history = history.slice(0, maxItems);
+        await chrome.storage.local.set({ searchHistory: history });
+    } catch (error) {
+        console.error('Failed to save search history:', error);
+    }
+}
+
+function createSearchHistoryDropdown(searchInput, searchContainer) {
+    // Create dropdown element
+    let dropdown = document.getElementById('search-history-dropdown');
+    if (!dropdown) {
+        dropdown = document.createElement('ul');
+        dropdown.id = 'search-history-dropdown';
+        dropdown.className = 'search-history-dropdown';
+        searchContainer.appendChild(dropdown);
+    }
+    return dropdown;
+}
+
+async function showSearchHistory(searchInput, dropdown) {
+    if (!currentSettings.saveSearchHistory) {
+        dropdown.style.display = 'none';
+        return;
+    }
+    
+    const history = await getSearchHistory();
+    if (history.length === 0) {
+        dropdown.style.display = 'none';
+        return;
+    }
+    
+    dropdown.innerHTML = history.map(item => 
+        `<li class="search-history-item">${escapeHtml(item)}</li>`
+    ).join('');
+    
+    dropdown.style.display = 'block';
+    
+    // Add mousedown handlers (fires before blur, so we can handle selection before hiding)
+    dropdown.querySelectorAll('.search-history-item').forEach((li, index) => {
+        li.addEventListener('mousedown', (e) => {
+            e.preventDefault(); // Prevent blur from firing
+            const query = history[index];
+            // Save to history again (moves to top)
+            saveSearchToHistory(query);
+            // Navigate directly instead of setting input value (prevents browser remembering value)
+            const form = searchInput.form;
+            const engine = form.action;
+            const param = searchInput.name;
+            window.location.href = `${engine}?${param}=${encodeURIComponent(query)}`;
+        });
+    });
+}
+
+function hideSearchHistory(dropdown) {
+    if (dropdown) {
+        dropdown.style.display = 'none';
+    }
+}
+
+// Escape HTML helper (if not already available from utils.js)
+function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+
 // Search setup
 function setupSearch() {
     const searchForm = document.querySelector('#search form');
     const searchInput = document.getElementById('q');
+    const searchContainer = document.getElementById('search');
 
-    if (searchForm && searchInput) {
-        searchForm.addEventListener('submit', () => {
-            setTimeout(() => {
-                searchInput.value = '';
-            }, 100);
+    if (searchForm && searchInput && searchContainer) {
+        const dropdown = createSearchHistoryDropdown(searchInput, searchContainer);
+        
+        // Show history on focus
+        searchInput.addEventListener('focus', () => {
+            showSearchHistory(searchInput, dropdown);
         });
+        
+        // Hide history immediately on blur
+        searchInput.addEventListener('blur', () => {
+            hideSearchHistory(dropdown);
+        });
+        
+        // Hide history when typing
+        searchInput.addEventListener('input', () => {
+            if (searchInput.value.trim()) {
+                hideSearchHistory(dropdown);
+            } else {
+                showSearchHistory(searchInput, dropdown);
+            }
+        });
+        
+        // Save search and clear input on submit
+        searchForm.addEventListener('submit', () => {
+            const query = searchInput.value.trim();
+            if (query) {
+                saveSearchToHistory(query);
+            }
+            // Clear input immediately to prevent browser remembering value
+            searchInput.value = '';
+        });
+        
+        // Clear input on page load/show (handles back button navigation)
+        searchInput.value = '';
     }
 }
 

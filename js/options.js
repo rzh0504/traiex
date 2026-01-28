@@ -35,6 +35,11 @@ const languageSelect = document.getElementById("language");
 const exportBtn = document.getElementById("export-btn");
 const importBtn = document.getElementById("import-btn");
 const importFileInput = document.getElementById("import-file");
+const saveSearchHistoryCheckbox = document.getElementById("saveSearchHistory");
+const maxSearchHistorySelect = document.getElementById("maxSearchHistory");
+const maxSearchHistorySection = document.getElementById("maxSearchHistorySection");
+const clearSearchHistorySection = document.getElementById("clearSearchHistorySection");
+const clearSearchHistoryBtn = document.getElementById("clearSearchHistoryBtn");
 
 // Auto-save debounce timer
 let autoSaveTimeout = null;
@@ -447,6 +452,11 @@ async function loadSettings() {
     showDockLabelsCheckbox.checked = result.showDockLabels || false;
     languageSelect.value = result.language || 'zh-CN';
     
+    // Search history settings
+    saveSearchHistoryCheckbox.checked = result.saveSearchHistory || false;
+    maxSearchHistorySelect.value = result.maxSearchHistory || 10;
+    updateSearchHistoryVisibility(result.saveSearchHistory || false);
+    
     // Initialize i18n with saved language
     initI18n(result.language || 'zh-CN');
     
@@ -491,6 +501,8 @@ async function saveSettings(e) {
     linkTarget: linkTargetSelect.value,
     showDockLabels: showDockLabelsCheckbox.checked,
     language: languageSelect.value,
+    saveSearchHistory: saveSearchHistoryCheckbox.checked,
+    maxSearchHistory: parseInt(maxSearchHistorySelect.value),
     bookmarkCategories: bookmarkCategories,
     dockSites: currentDockSites
   };
@@ -525,6 +537,9 @@ async function resetSettings() {
       bookmarksFontWeightSelect.value = defaultSettings.bookmarksFontWeight;
       languageSelect.value = defaultSettings.language;
       setLanguage(defaultSettings.language);
+      saveSearchHistoryCheckbox.checked = defaultSettings.saveSearchHistory;
+      maxSearchHistorySelect.value = defaultSettings.maxSearchHistory;
+      updateSearchHistoryVisibility(defaultSettings.saveSearchHistory);
       bookmarkCategories = JSON.parse(JSON.stringify(defaultBookmarkCategories));
       renderCategories();
       currentDockSites = JSON.parse(JSON.stringify(defaultDockSites));
@@ -686,6 +701,8 @@ function triggerAutoSave() {
       linkTarget: linkTargetSelect.value,
       showDockLabels: showDockLabelsCheckbox.checked,
       language: languageSelect.value,
+      saveSearchHistory: saveSearchHistoryCheckbox.checked,
+      maxSearchHistory: parseInt(maxSearchHistorySelect.value),
       bookmarkCategories: bookmarkCategories,
       dockSites: currentDockSites
     };
@@ -698,13 +715,33 @@ function triggerAutoSave() {
   }, 1000); // 1 second debounce
 }
 
+// Update search history related section visibility
+function updateSearchHistoryVisibility(isEnabled) {
+  maxSearchHistorySection.style.display = isEnabled ? '' : 'none';
+  clearSearchHistorySection.style.display = isEnabled ? '' : 'none';
+}
+
+// Clear search history from local storage
+async function clearSearchHistory() {
+  if (confirm(t('delete_confirm') || '确定要清除搜索历史吗？')) {
+    try {
+      await chrome.storage.local.remove('searchHistory');
+      showToast(t('search_history_cleared'), 'success');
+    } catch (error) {
+      console.error('Failed to clear search history:', error);
+      showToast('清除失败，请重试。', 'error');
+    }
+  }
+}
+
 // Setup auto-save listeners
 function setupAutoSave() {
   // Add change listeners to all form elements
   const autoSaveElements = [
     showDateTimeCheckbox, showDockCheckbox, showBookmarksCheckbox,
     searchEngineSelect, themeSelect, linkTargetSelect, 
-    bookmarksFontWeightSelect, showDockLabelsCheckbox, languageSelect
+    bookmarksFontWeightSelect, showDockLabelsCheckbox, languageSelect,
+    saveSearchHistoryCheckbox, maxSearchHistorySelect
   ];
   autoSaveElements.forEach(el => {
     el.addEventListener('change', triggerAutoSave);
@@ -713,6 +750,11 @@ function setupAutoSave() {
   // Language selector needs special handling for instant UI update
   languageSelect.addEventListener('change', () => {
     setLanguage(languageSelect.value);
+  });
+  
+  // Search history toggle needs special handling for visibility
+  saveSearchHistoryCheckbox.addEventListener('change', () => {
+    updateSearchHistoryVisibility(saveSearchHistoryCheckbox.checked);
   });
   
   // Range and color inputs use input event
@@ -732,6 +774,9 @@ document.addEventListener("DOMContentLoaded", () => {
   setupBorderRadiusInput();
   setupImportExport();
   setupAutoSave();
+  
+  // Clear search history button
+  clearSearchHistoryBtn.addEventListener('click', clearSearchHistory);
   
   // Global touch event listeners for mobile drag support
   document.addEventListener('touchmove', handleCategoryTouchMove, { passive: false });
