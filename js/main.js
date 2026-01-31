@@ -369,12 +369,16 @@ function setupSearch() {
             if (query) {
                 saveSearchToHistory(query);
             }
-            // Clear input immediately to prevent browser remembering value
-            searchInput.value = '';
+            // Clear input with a small delay to allow form submission to process
+            setTimeout(() => {
+                searchInput.value = '';
+            }, 10);
         });
         
-        // Clear input on page load/show (handles back button navigation)
-        searchInput.value = '';
+        // Clear input on page load/show (handles back button navigation/bfcache)
+        window.addEventListener('pageshow', () => {
+             searchInput.value = '';
+        });
     }
 }
 
