@@ -11,6 +11,10 @@ let bookmarkCategories = [];
 // Current dock sites
 let currentDockSites = [];
 
+// Category limits
+const MIN_CATEGORIES = 2;
+const MAX_CATEGORIES = 4;
+
 // DOM Elements
 const form = document.getElementById("settings-form");
 const showDateTimeCheckbox = document.getElementById("showDateTime");
@@ -160,6 +164,10 @@ function updateBorderRadiusDisplay(value) {
 function renderCategories() {
   categoriesContainer.innerHTML = '';
   
+  // Determine if delete buttons should be shown
+  const canDelete = bookmarkCategories.length > MIN_CATEGORIES;
+  const canAdd = bookmarkCategories.length < MAX_CATEGORIES;
+  
   bookmarkCategories.forEach((category, catIndex) => {
     const categoryEl = document.createElement('div');
     categoryEl.className = 'bookmark-category';
@@ -198,11 +206,17 @@ function renderCategories() {
     // Touch support for mobile
     categoryEl.addEventListener('touchstart', (e) => handleCategoryTouchStart(e, catIndex, categoryEl), { passive: false });
     
+    // Delete button HTML (only show if can delete)
+    const deleteButtonHtml = canDelete 
+      ? `<button type="button" class="delete-category-btn" data-cat-index="${catIndex}" title="${t('delete_category')}">×</button>`
+      : '';
+    
     categoryEl.innerHTML = `
       <div class="category-header">
         <span class="drag-handle" title="拖拽排序">⋮⋮</span>
         <input type="text" class="category-name-input" value="${escapeHtml(category.name)}" 
                data-cat-index="${catIndex}" placeholder="分类名称">
+        ${deleteButtonHtml}
       </div>
       <div class="category-bookmarks" data-cat-index="${catIndex}">
         ${renderBookmarkItems(category.bookmarks, catIndex)}
@@ -215,6 +229,16 @@ function renderCategories() {
     `;
     categoriesContainer.appendChild(categoryEl);
   });
+  
+  // Add "Add Category" button at the bottom
+  if (canAdd) {
+    const addCategoryBtn = document.createElement('button');
+    addCategoryBtn.type = 'button';
+    addCategoryBtn.className = 'add-category-btn';
+    addCategoryBtn.innerHTML = `<span>+</span> ${t('add_category')}`;
+    addCategoryBtn.addEventListener('click', addCategory);
+    categoriesContainer.appendChild(addCategoryBtn);
+  }
   
   // Add event listeners
   setupCategoryEventListeners();
@@ -243,6 +267,14 @@ function setupCategoryEventListeners() {
     input.addEventListener('change', (e) => {
       const catIndex = parseInt(e.target.dataset.catIndex);
       bookmarkCategories[catIndex].name = e.target.value.trim() || `分类 ${catIndex + 1}`;
+    });
+  });
+  
+  // Delete category buttons
+  categoriesContainer.querySelectorAll('.delete-category-btn').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      const catIndex = parseInt(e.target.dataset.catIndex);
+      deleteCategory(catIndex);
     });
   });
   
@@ -332,6 +364,43 @@ function addBookmarkToCategory(catIndex) {
 function deleteBookmark(catIndex, bookmarkIndex) {
   bookmarkCategories[catIndex].bookmarks.splice(bookmarkIndex, 1);
   renderCategories();
+}
+
+// Add new category
+function addCategory() {
+  if (bookmarkCategories.length >= MAX_CATEGORIES) {
+    showToast(t('category_limit_max'), 'warning');
+    return;
+  }
+  
+  bookmarkCategories.push({
+    name: t('new_category'),
+    bookmarks: []
+  });
+  renderCategories();
+  
+  // Focus on the new category name input
+  const inputs = categoriesContainer.querySelectorAll('.category-name-input');
+  const lastInput = inputs[inputs.length - 1];
+  if (lastInput) {
+    lastInput.focus();
+    lastInput.select();
+  }
+}
+
+// Delete category
+function deleteCategory(catIndex) {
+  if (bookmarkCategories.length <= MIN_CATEGORIES) {
+    showToast(t('category_limit_min'), 'warning');
+    return;
+  }
+  
+  const categoryName = bookmarkCategories[catIndex].name;
+  if (confirm(t('delete_category_confirm'))) {
+    bookmarkCategories.splice(catIndex, 1);
+    renderCategories();
+    showToast(`"${categoryName}" ${t('delete_category')}`, 'success');
+  }
 }
 
 // Render Dock Manager

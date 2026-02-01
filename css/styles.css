@@ -464,7 +464,17 @@ aside svg { height: 4.5rem; }
         padding: 0;
     }
 
-    #bookmarks { flex-direction: row; }
+    #bookmarks { 
+        flex-direction: row;
+        justify-content: space-between;
+    }
+    
+    /* Center bookmarks when there are 2-3 columns */
+    #bookmarks[data-columns="2"],
+    #bookmarks[data-columns="3"] {
+        justify-content: center;
+        gap: var(--spacing-l);
+    }
 }
 
 /* Forced Theme Overrides */

@@ -75,11 +75,16 @@ const translations = {
         
         // Bookmark management
         add_category: '添加分类',
+        delete_category: '删除分类',
         category_name: '分类名称',
         add_bookmark: '添加书签',
         bookmark_name: '书签名称',
         bookmark_url: '书签网址',
         delete_confirm: '确定要删除吗？',
+        delete_category_confirm: '确定要删除此分类吗？其中的书签也会被删除。',
+        category_limit_min: '至少需要2个分类',
+        category_limit_max: '最多只能有4个分类',
+        new_category: '新分类',
         
         // Color presets
         color_lavender: '淡紫蓝 (默认)',
@@ -180,11 +185,16 @@ const translations = {
         
         // Bookmark management
         add_category: 'Add Category',
+        delete_category: 'Delete Category',
         category_name: 'Category Name',
         add_bookmark: 'Add Bookmark',
         bookmark_name: 'Bookmark Name',
         bookmark_url: 'Bookmark URL',
         delete_confirm: 'Are you sure you want to delete?',
+        delete_category_confirm: 'Are you sure you want to delete this category? All bookmarks in it will be removed.',
+        category_limit_min: 'Minimum 2 categories required',
+        category_limit_max: 'Maximum 4 categories allowed',
+        new_category: 'New Category',
         
         // Color presets
         color_lavender: 'Lavender (Default)',

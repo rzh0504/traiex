@@ -195,7 +195,7 @@ function renderDock() {
     dockContainer.appendChild(ul);
 }
 
-// Render Bookmarks (4-column categorized layout)
+// Render Bookmarks (categorized layout)
 function renderBookmarks() {
     const bookmarksContainer = document.getElementById('bookmarks');
     bookmarksContainer.innerHTML = '';
@@ -206,6 +206,9 @@ function renderBookmarks() {
     if (!categories || categories.length === 0) {
         return;
     }
+    
+    // Set data attribute for CSS to adjust layout based on column count
+    bookmarksContainer.dataset.columns = categories.length;
     
     // Render each category as a column (ul)
     categories.forEach(category => {
@@ -565,6 +568,13 @@ function setupSearch() {
              searchInput.value = '';
              // Prevent browser from restoring focus on refresh
              searchInput.blur();
+        });
+        
+        // Remove focus when switching back to this tab
+        document.addEventListener('visibilitychange', () => {
+            if (document.visibilityState === 'visible') {
+                searchInput.blur();
+            }
         });
     }
 }

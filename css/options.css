@@ -614,6 +614,60 @@ select:focus {
   font-style: italic;
 }
 
+/* Delete Category Button */
+.delete-category-btn {
+  width: 1.5rem;
+  height: 1.5rem;
+  padding: 0;
+  border: 1px solid transparent;
+  border-radius: 0.25rem;
+  background: transparent;
+  color: var(--primary-link-color);
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.delete-category-btn:hover {
+  border-color: #e53e3e;
+  color: #e53e3e;
+  background: rgba(229, 62, 62, 0.1);
+}
+
+/* Add Category Button */
+.add-category-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-s);
+  width: 100%;
+  padding: var(--spacing-m);
+  border: 2px dashed var(--primary-link-color);
+  border-radius: 0.25rem;
+  background: transparent;
+  color: var(--primary-link-color);
+  font-family: var(--font-monospace);
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.add-category-btn:hover {
+  border-color: var(--primary-font-color);
+  color: var(--primary-font-color);
+  background: rgba(128, 128, 128, 0.05);
+}
+
+.add-category-btn span {
+  font-size: 1.2rem;
+  font-weight: 600;
+}
+
 /* Responsive for bookmark categories */
 @media screen and (max-width: 640px) {
   .add-bookmark-inline {
