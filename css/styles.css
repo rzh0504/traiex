@@ -107,11 +107,15 @@ aside svg { height: 4.5rem; }
     padding: var(--spacing-m);
 }
 
-#dock a:focus,
 #dock a:hover {
     /* animation: slime 0.75s cubic-bezier(0.455, 0.030, 0.515, 0.955) both; */
     transform: scale(1.2);
-    outline: none;
+}
+
+#dock a:focus-visible {
+    transform: scale(1.2);
+    outline: 2px solid var(--color-theme-accent, currentColor);
+    outline-offset: 2px;
 }
 
 #dock a:active {
