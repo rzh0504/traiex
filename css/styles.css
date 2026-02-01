@@ -284,7 +284,11 @@ aside svg { height: 4.5rem; }
     backdrop-filter: blur(8px);
 }
 
-.search-history-item {
+.search-history-item,
+.search-bookmark-item {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-s);
     padding: var(--spacing-s) var(--spacing-m);
     cursor: pointer;
     color: var(--primary-font-color);
@@ -292,9 +296,32 @@ aside svg { height: 4.5rem; }
     transition: background-color 0.15s ease;
 }
 
-.search-history-item:hover {
+.search-history-item:hover,
+.search-bookmark-item:hover {
     background-color: hsl(var(--color-theme-accent-hsl) / 0.1);
     color: var(--color-theme-accent);
+}
+
+/* Suggestion icons */
+.suggestion-icon {
+    flex-shrink: 0;
+    font-size: 0.85rem;
+    opacity: 0.7;
+}
+
+.suggestion-text {
+    flex: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Match highlighting */
+.search-match {
+    background-color: hsl(var(--color-theme-accent-hsl) / 0.25);
+    color: inherit;
+    border-radius: 2px;
+    padding: 0 2px;
 }
 
 /* Dark mode - search history dropdown */
@@ -305,9 +332,14 @@ aside svg { height: 4.5rem; }
         box-shadow: 0 4px 12px hsl(0 0% 0% / 0.3);
     }
     
-    .search-history-item:hover {
+    .search-history-item:hover,
+    .search-bookmark-item:hover {
         background-color: hsl(var(--color-white-hsl) / 0.1);
         color: var(--color-white);
+    }
+    
+    .search-match {
+        background-color: hsl(var(--color-theme-accent-hsl) / 0.35);
     }
 }
 
@@ -317,7 +349,8 @@ aside svg { height: 4.5rem; }
     border-color: hsl(var(--color-theme-dark-hsl) / 0.15);
 }
 
-.theme-light .search-history-item:hover {
+.theme-light .search-history-item:hover,
+.theme-light .search-bookmark-item:hover {
     background-color: hsl(var(--color-theme-accent-hsl) / 0.1);
     color: var(--color-theme-accent);
 }
@@ -328,9 +361,14 @@ aside svg { height: 4.5rem; }
     box-shadow: 0 4px 12px hsl(0 0% 0% / 0.3);
 }
 
-.theme-dark .search-history-item:hover {
+.theme-dark .search-history-item:hover,
+.theme-dark .search-bookmark-item:hover {
     background-color: hsl(var(--color-white-hsl) / 0.1);
     color: var(--color-white);
+}
+
+.theme-dark .search-match {
+    background-color: hsl(var(--color-theme-accent-hsl) / 0.35);
 }
 
 #bookmarks {

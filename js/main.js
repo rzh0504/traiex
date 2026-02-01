@@ -276,7 +276,129 @@ async function saveSearchToHistory(query) {
     }
 }
 
-function createSearchHistoryDropdown(searchInput, searchContainer) {
+// Debounce function for input handling
+function debounce(func, wait) {
+    let timeout;
+    return function executedFunction(...args) {
+        clearTimeout(timeout);
+        timeout = setTimeout(() => func.apply(this, args), wait);
+    };
+}
+
+// Get all bookmarks from categories (flattened)
+function getAllBookmarks() {
+    const categories = bookmarkCategories || defaultBookmarkCategories;
+    if (!categories) return [];
+    
+    const bookmarks = [];
+    categories.forEach(category => {
+        if (category.bookmarks) {
+            category.bookmarks.forEach(bookmark => {
+                bookmarks.push({
+                    name: bookmark.name,
+                    url: bookmark.url,
+                    category: category.name
+                });
+            });
+        }
+    });
+    return bookmarks;
+}
+
+// Get local matches for the query
+async function getLocalMatches(query) {
+    const results = [];
+    const lowerQuery = query.toLowerCase();
+    
+    // Match search history
+    if (currentSettings.saveSearchHistory) {
+        const history = await getSearchHistory();
+        history.forEach(item => {
+            const lowerItem = item.toLowerCase();
+            const matchIndex = lowerItem.indexOf(lowerQuery);
+            if (matchIndex !== -1) {
+                results.push({
+                    type: 'history',
+                    text: item,
+                    url: null,
+                    matchIndex: matchIndex,
+                    matchLength: query.length
+                });
+            }
+        });
+    }
+    
+    // Match bookmarks (name and URL)
+    const bookmarks = getAllBookmarks();
+    bookmarks.forEach(bookmark => {
+        const lowerName = bookmark.name.toLowerCase();
+        const lowerUrl = bookmark.url.toLowerCase();
+        
+        // Try to match name first
+        let matchIndex = lowerName.indexOf(lowerQuery);
+        if (matchIndex !== -1) {
+            results.push({
+                type: 'bookmark',
+                text: bookmark.name,
+                url: bookmark.url,
+                category: bookmark.category,
+                matchIndex: matchIndex,
+                matchLength: query.length
+            });
+        } else {
+            // Try to match URL
+            matchIndex = lowerUrl.indexOf(lowerQuery);
+            if (matchIndex !== -1) {
+                results.push({
+                    type: 'bookmark',
+                    text: bookmark.name,
+                    url: bookmark.url,
+                    category: bookmark.category,
+                    matchIndex: -1, // URL match, no highlight on name
+                    matchLength: query.length
+                });
+            }
+        }
+    });
+    
+    // Sort: exact matches first, then by match position
+    results.sort((a, b) => {
+        // Exact match priority
+        const aExact = a.text.toLowerCase() === lowerQuery;
+        const bExact = b.text.toLowerCase() === lowerQuery;
+        if (aExact && !bExact) return -1;
+        if (!aExact && bExact) return 1;
+        
+        // History items first when same match position
+        if (a.type === 'history' && b.type !== 'history') return -1;
+        if (a.type !== 'history' && b.type === 'history') return 1;
+        
+        // Earlier match position is better
+        if (a.matchIndex !== b.matchIndex) {
+            if (a.matchIndex === -1) return 1;
+            if (b.matchIndex === -1) return -1;
+            return a.matchIndex - b.matchIndex;
+        }
+        
+        return 0;
+    });
+    
+    // Limit results
+    return results.slice(0, 10);
+}
+
+// Highlight matching text
+function highlightMatch(text, matchIndex, matchLength) {
+    if (matchIndex === -1 || matchLength === 0) {
+        return escapeHtml(text);
+    }
+    const before = escapeHtml(text.substring(0, matchIndex));
+    const match = escapeHtml(text.substring(matchIndex, matchIndex + matchLength));
+    const after = escapeHtml(text.substring(matchIndex + matchLength));
+    return `${before}<mark class="search-match">${match}</mark>${after}`;
+}
+
+function createSearchSuggestionsDropdown(searchInput, searchContainer) {
     // Create dropdown element
     let dropdown = document.getElementById('search-history-dropdown');
     if (!dropdown) {
@@ -288,7 +410,14 @@ function createSearchHistoryDropdown(searchInput, searchContainer) {
     return dropdown;
 }
 
+// Show search history (when input is empty)
 async function showSearchHistory(searchInput, dropdown) {
+    // Only show if search input is focused
+    if (document.activeElement !== searchInput) {
+        dropdown.style.display = 'none';
+        return;
+    }
+    
     if (!currentSettings.saveSearchHistory) {
         dropdown.style.display = 'none';
         return;
@@ -301,19 +430,17 @@ async function showSearchHistory(searchInput, dropdown) {
     }
     
     dropdown.innerHTML = history.map(item => 
-        `<li class="search-history-item">${escapeHtml(item)}</li>`
+        `<li class="search-history-item" data-type="history">${escapeHtml(item)}</li>`
     ).join('');
     
     dropdown.style.display = 'block';
     
-    // Add mousedown handlers (fires before blur, so we can handle selection before hiding)
+    // Add mousedown handlers
     dropdown.querySelectorAll('.search-history-item').forEach((li, index) => {
         li.addEventListener('mousedown', (e) => {
-            e.preventDefault(); // Prevent blur from firing
+            e.preventDefault();
             const query = history[index];
-            // Save to history again (moves to top)
             saveSearchToHistory(query);
-            // Navigate directly instead of setting input value (prevents browser remembering value)
             const form = searchInput.form;
             const engine = form.action;
             const param = searchInput.name;
@@ -322,7 +449,55 @@ async function showSearchHistory(searchInput, dropdown) {
     });
 }
 
-function hideSearchHistory(dropdown) {
+// Show search suggestions (when input has content)
+async function showSearchSuggestions(searchInput, dropdown, query) {
+    // Only show if search input is focused
+    if (document.activeElement !== searchInput) {
+        dropdown.style.display = 'none';
+        return;
+    }
+    const matches = await getLocalMatches(query);
+    
+    if (matches.length === 0) {
+        dropdown.style.display = 'none';
+        return;
+    }
+    
+    dropdown.innerHTML = matches.map(match => {
+        const typeClass = match.type === 'bookmark' ? 'search-bookmark-item' : 'search-history-item';
+        const typeIcon = match.type === 'bookmark' ? '🔖' : '🕐';
+        const highlightedText = highlightMatch(match.text, match.matchIndex, match.matchLength);
+        
+        return `<li class="${typeClass}" data-type="${match.type}" data-url="${match.url || ''}">
+            <span class="suggestion-icon">${typeIcon}</span>
+            <span class="suggestion-text">${highlightedText}</span>
+        </li>`;
+    }).join('');
+    
+    dropdown.style.display = 'block';
+    
+    // Add mousedown handlers
+    dropdown.querySelectorAll('li').forEach((li, index) => {
+        li.addEventListener('mousedown', (e) => {
+            e.preventDefault();
+            const match = matches[index];
+            
+            if (match.type === 'bookmark' && match.url) {
+                // Navigate directly to bookmark URL
+                window.open(match.url, currentSettings.linkTarget || '_blank');
+            } else {
+                // Search for the history item
+                saveSearchToHistory(match.text);
+                const form = searchInput.form;
+                const engine = form.action;
+                const param = searchInput.name;
+                window.location.href = `${engine}?${param}=${encodeURIComponent(match.text)}`;
+            }
+        });
+    });
+}
+
+function hideSuggestions(dropdown) {
     if (dropdown) {
         dropdown.style.display = 'none';
     }
@@ -342,25 +517,35 @@ function setupSearch() {
     const searchContainer = document.getElementById('search');
 
     if (searchForm && searchInput && searchContainer) {
-        const dropdown = createSearchHistoryDropdown(searchInput, searchContainer);
+        const dropdown = createSearchSuggestionsDropdown(searchInput, searchContainer);
         
-        // Show history on focus
-        searchInput.addEventListener('focus', () => {
-            showSearchHistory(searchInput, dropdown);
-        });
-        
-        // Hide history immediately on blur
-        searchInput.addEventListener('blur', () => {
-            hideSearchHistory(dropdown);
-        });
-        
-        // Hide history when typing
-        searchInput.addEventListener('input', () => {
-            if (searchInput.value.trim()) {
-                hideSearchHistory(dropdown);
+        // Debounced search suggestion handler
+        const debouncedSearch = debounce(async (query) => {
+            if (query.trim()) {
+                await showSearchSuggestions(searchInput, dropdown, query.trim());
             } else {
-                showSearchHistory(searchInput, dropdown);
+                await showSearchHistory(searchInput, dropdown);
             }
+        }, 200);
+        
+        // Show history on focus (only if empty)
+        searchInput.addEventListener('focus', () => {
+            if (!searchInput.value.trim()) {
+                showSearchHistory(searchInput, dropdown);
+            } else {
+                // Show suggestions for current value
+                showSearchSuggestions(searchInput, dropdown, searchInput.value.trim());
+            }
+        });
+        
+        // Hide suggestions immediately on blur
+        searchInput.addEventListener('blur', () => {
+            hideSuggestions(dropdown);
+        });
+        
+        // Debounced input handling
+        searchInput.addEventListener('input', () => {
+            debouncedSearch(searchInput.value);
         });
         
         // Save search and clear input on submit
@@ -375,12 +560,15 @@ function setupSearch() {
             }, 10);
         });
         
-        // Clear input on page load/show (handles back button navigation/bfcache)
+        // Clear input and remove focus on page load/show (handles back button navigation/bfcache)
         window.addEventListener('pageshow', () => {
              searchInput.value = '';
+             // Prevent browser from restoring focus on refresh
+             searchInput.blur();
         });
     }
 }
+
 
 // Initialize
 async function traichu() {
