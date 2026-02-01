@@ -53,7 +53,7 @@ function setupKeyboardShortcuts() {
     // Skip if IME composition is in progress (for Chinese/Japanese input methods)
     if (e.isComposing) return;
 
-    // '/' key focuses search box (when not already in an input)
+    // '/' key focuses search box and shows dropdown (when not already in an input)
     if (
       e.key === "/" &&
       !["INPUT", "TEXTAREA"].includes(document.activeElement.tagName)
@@ -62,6 +62,8 @@ function setupKeyboardShortcuts() {
       const searchInput = document.getElementById("q");
       if (searchInput) {
         searchInput.focus();
+        // Dispatch a click event to trigger dropdown display
+        searchInput.dispatchEvent(new MouseEvent("click", { bubbles: true }));
       }
     }
 

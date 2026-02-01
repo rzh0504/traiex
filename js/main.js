@@ -647,15 +647,18 @@ function setupSearch() {
       dropdown.dataset.selectedIndex = "-1";
     }, 200);
 
-    // Show history on focus (only if empty)
-    searchInput.addEventListener("focus", () => {
+    // Helper function to show dropdown based on current input value
+    const showDropdownIfNeeded = () => {
       if (!searchInput.value.trim()) {
         showSearchHistory(searchInput, dropdown);
       } else {
-        // Show suggestions for current value
         showSearchSuggestions(searchInput, dropdown, searchInput.value.trim());
       }
-    });
+    };
+
+    // Show dropdown on click (not focus) - this prevents dropdown from showing
+    // when focus comes from browser UI like bookmark bar
+    searchInput.addEventListener("click", showDropdownIfNeeded);
 
     // Hide suggestions immediately on blur
     searchInput.addEventListener("blur", () => {
