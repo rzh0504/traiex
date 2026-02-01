@@ -78,6 +78,22 @@ aside svg { height: 4.5rem; }
 
 #dock {
     order: 2;
+    position: relative;
+}
+
+/* Mobile scroll fade hint - indicates more content to scroll */
+@media screen and (max-width: 48em) {
+    #dock::after {
+        content: '';
+        position: absolute;
+        right: 0;
+        top: 0;
+        bottom: 0;
+        width: 2rem;
+        background: linear-gradient(to right, transparent, var(--primary-background-color));
+        pointer-events: none;
+        opacity: 0.8;
+    }
 }
 
 #dock ul {
@@ -179,6 +195,7 @@ aside svg { height: 4.5rem; }
 
 #search input {
     background-color: transparent;
+    background-image: var(--svg-google);
     background-position: left 1rem center;
     background-repeat: no-repeat;
     background-size: 1.5rem 1.5rem;
@@ -190,6 +207,11 @@ aside svg { height: 4.5rem; }
     padding: var(--spacing-m) 3rem var(--spacing-m) 3.5rem;
     width: 100%;
 }
+
+/* Search engine icons - shared across all themes */
+#search input[data-engine="bing"] { background-image: var(--svg-bing); }
+#search input[data-engine="duckduckgo"] { background-image: var(--svg-ddg); }
+#search input[data-engine="baidu"] { background-image: var(--svg-baidu); }
 
 #search-btn {
     position: absolute;
@@ -227,10 +249,9 @@ aside svg { height: 4.5rem; }
     #bookmarks a:focus,
     #bookmarks a:hover { background-color: hsl(var(--color-white-hsl) / 0.05); }
     
-    /* Search engine icons - dark mode */
-    #search input[data-engine="bing"] { background-image: var(--svg-bing); }
-    #search input[data-engine="duckduckgo"] { background-image: var(--svg-ddg); }
-    #search input[data-engine="baidu"] { background-image: var(--svg-baidu); }
+    .favicon {
+        background-color: hsl(var(--color-white-hsl) / 0.1);
+    }
     
     /* Search button icon - invert for dark mode */
     #search-btn {
@@ -251,11 +272,6 @@ aside svg { height: 4.5rem; }
 
     #bookmarks a:focus,
     #bookmarks a:hover { background-color: hsl(var(--color-theme-dark-hsl) / 0.08); }
-    
-    /* Search engine icons - light mode */
-    #search input[data-engine="bing"] { background-image: var(--svg-bing); }
-    #search input[data-engine="duckduckgo"] { background-image: var(--svg-ddg); }
-    #search input[data-engine="baidu"] { background-image: var(--svg-baidu); }
 }
 
 #search input:focus {
@@ -301,7 +317,9 @@ aside svg { height: 4.5rem; }
 }
 
 .search-history-item:hover,
-.search-bookmark-item:hover {
+.search-bookmark-item:hover,
+.search-history-item.selected,
+.search-bookmark-item.selected {
     background-color: hsl(var(--color-theme-accent-hsl) / 0.1);
     color: var(--color-theme-accent);
 }
@@ -337,7 +355,9 @@ aside svg { height: 4.5rem; }
     }
     
     .search-history-item:hover,
-    .search-bookmark-item:hover {
+    .search-bookmark-item:hover,
+    .search-history-item.selected,
+    .search-bookmark-item.selected {
         background-color: hsl(var(--color-white-hsl) / 0.1);
         color: var(--color-white);
     }
@@ -354,7 +374,9 @@ aside svg { height: 4.5rem; }
 }
 
 .theme-light .search-history-item:hover,
-.theme-light .search-bookmark-item:hover {
+.theme-light .search-bookmark-item:hover,
+.theme-light .search-history-item.selected,
+.theme-light .search-bookmark-item.selected {
     background-color: hsl(var(--color-theme-accent-hsl) / 0.1);
     color: var(--color-theme-accent);
 }
@@ -366,7 +388,9 @@ aside svg { height: 4.5rem; }
 }
 
 .theme-dark .search-history-item:hover,
-.theme-dark .search-bookmark-item:hover {
+.theme-dark .search-bookmark-item:hover,
+.theme-dark .search-history-item.selected,
+.theme-dark .search-bookmark-item.selected {
     background-color: hsl(var(--color-white-hsl) / 0.1);
     color: var(--color-white);
 }
@@ -415,6 +439,10 @@ aside svg { height: 4.5rem; }
 .favicon {
     margin-right: var(--spacing-s);
     height: 1rem;
+    width: 1rem;
+    min-width: 1rem;
+    background-color: hsl(var(--color-theme-dark-hsl) / 0.1);
+    border-radius: 2px;
 }
 
 #bookmarks a {
@@ -504,11 +532,6 @@ aside svg { height: 4.5rem; }
 .theme-light #bookmarks a:focus,
 .theme-light #bookmarks a:hover { background-color: hsl(var(--color-theme-dark-hsl) / 0.08); }
 
-/* Light theme - search engine icons */
-.theme-light #search input[data-engine="bing"] { background-image: var(--svg-bing); }
-.theme-light #search input[data-engine="duckduckgo"] { background-image: var(--svg-ddg); }
-.theme-light #search input[data-engine="baidu"] { background-image: var(--svg-baidu); }
-
 /* Dark theme forced */
 :root.theme-dark {
     --primary-background-color: var(--color-black);
@@ -530,10 +553,9 @@ aside svg { height: 4.5rem; }
 .theme-dark #bookmarks a:focus,
 .theme-dark #bookmarks a:hover { background-color: hsl(var(--color-white-hsl) / 0.05); }
 
-/* Dark theme - search engine icons */
-.theme-dark #search input[data-engine="bing"] { background-image: var(--svg-bing); }
-.theme-dark #search input[data-engine="duckduckgo"] { background-image: var(--svg-ddg); }
-.theme-dark #search input[data-engine="baidu"] { background-image: var(--svg-baidu); }
+.theme-dark .favicon {
+    background-color: hsl(var(--color-white-hsl) / 0.1);
+}
 
 /* Dark theme - search button icon */
 .theme-dark #search-btn {

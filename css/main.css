@@ -1,7 +1,6 @@
 /* Based on Josh Comeau's Custom CSS Reset - https://www.joshwcomeau.com/css/custom-css-reset/ */
 @import url('reset.css');
-/* Google Fonts */
-@import url('https://fonts.googleapis.com/css2?family=Fira+Code&display=swap');
+/* Google Fonts - moved to HTML <link> for better performance */
 /* Variables */
 @import url('vars.css');
 /* Animations */

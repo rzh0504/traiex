@@ -165,7 +165,11 @@ function dateTime() {
     lastTimeString = timeString;
   }
 
-  setTimeout(dateTime, 1000);
+  // Calculate delay until next minute for efficiency (instead of checking every second)
+  const now = new Date();
+  const msUntilNextMinute =
+    (60 - now.getSeconds()) * 1000 - now.getMilliseconds() + 50; // +50ms buffer
+  setTimeout(dateTime, msUntilNextMinute);
 }
 
 // Render Dock Sites
@@ -556,15 +560,68 @@ async function showSearchSuggestions(searchInput, dropdown, query) {
 function hideSuggestions(dropdown) {
   if (dropdown) {
     dropdown.style.display = "none";
+    // Reset selected index when hiding
+    dropdown.dataset.selectedIndex = "-1";
   }
 }
 
-// Escape HTML helper (if not already available from utils.js)
-function escapeHtml(text) {
-  const div = document.createElement("div");
-  div.textContent = text;
-  return div.innerHTML;
+// Keyboard navigation for dropdown
+function handleDropdownKeyboard(e, searchInput, dropdown, searchForm) {
+  if (dropdown.style.display === "none") return false;
+
+  const items = dropdown.querySelectorAll("li");
+  if (items.length === 0) return false;
+
+  let selectedIndex = parseInt(dropdown.dataset.selectedIndex || "-1");
+
+  if (e.key === "ArrowDown") {
+    e.preventDefault();
+    selectedIndex = Math.min(selectedIndex + 1, items.length - 1);
+  } else if (e.key === "ArrowUp") {
+    e.preventDefault();
+    selectedIndex = Math.max(selectedIndex - 1, -1);
+  } else if (e.key === "Enter" && selectedIndex >= 0) {
+    e.preventDefault();
+    items[selectedIndex].dispatchEvent(new MouseEvent("mousedown"));
+    return true;
+  } else {
+    return false;
+  }
+
+  // Update visual selection
+  items.forEach((item, i) => {
+    item.classList.toggle("selected", i === selectedIndex);
+  });
+  dropdown.dataset.selectedIndex = selectedIndex.toString();
+
+  // Update input value to show selected item text
+  if (selectedIndex >= 0) {
+    const textEl = items[selectedIndex].querySelector(".suggestion-text");
+    if (textEl) {
+      // Store original value if not stored
+      if (!searchInput.dataset.originalValue) {
+        searchInput.dataset.originalValue = searchInput.value;
+      }
+      searchInput.value = textEl.textContent;
+    } else {
+      // For history items without .suggestion-text
+      if (!searchInput.dataset.originalValue) {
+        searchInput.dataset.originalValue = searchInput.value;
+      }
+      searchInput.value = items[selectedIndex].textContent;
+    }
+  } else {
+    // Restore original value when going back up
+    if (searchInput.dataset.originalValue !== undefined) {
+      searchInput.value = searchInput.dataset.originalValue;
+      delete searchInput.dataset.originalValue;
+    }
+  }
+
+  return true;
 }
+
+// escapeHtml is loaded from js/utils.js
 
 // Search setup
 function setupSearch() {
@@ -577,6 +634,7 @@ function setupSearch() {
       searchInput,
       searchContainer,
     );
+    dropdown.dataset.selectedIndex = "-1";
 
     // Debounced search suggestion handler
     const debouncedSearch = debounce(async (query) => {
@@ -585,6 +643,8 @@ function setupSearch() {
       } else {
         await showSearchHistory(searchInput, dropdown);
       }
+      // Reset selection when results change
+      dropdown.dataset.selectedIndex = "-1";
     }, 200);
 
     // Show history on focus (only if empty)
@@ -600,10 +660,19 @@ function setupSearch() {
     // Hide suggestions immediately on blur
     searchInput.addEventListener("blur", () => {
       hideSuggestions(dropdown);
+      delete searchInput.dataset.originalValue;
+    });
+
+    // Keyboard navigation for dropdown
+    searchInput.addEventListener("keydown", (e) => {
+      if (["ArrowDown", "ArrowUp", "Enter"].includes(e.key)) {
+        handleDropdownKeyboard(e, searchInput, dropdown, searchForm);
+      }
     });
 
     // Debounced input handling
     searchInput.addEventListener("input", () => {
+      delete searchInput.dataset.originalValue; // Clear stored value on manual input
       debouncedSearch(searchInput.value);
     });
 
@@ -626,9 +695,10 @@ function setupSearch() {
       searchInput.blur();
     });
 
-    // Remove focus when switching back to this tab
+    // Remove focus when switching back to this tab (only if input is empty)
+    // This prevents disrupting user input while allowing clean state on tab switch
     document.addEventListener("visibilitychange", () => {
-      if (document.visibilityState === "visible") {
+      if (document.visibilityState === "visible" && !searchInput.value.trim()) {
         searchInput.blur();
       }
     });
