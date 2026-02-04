@@ -194,7 +194,17 @@ function renderDock() {
     const li = document.createElement("li");
     const a = document.createElement("a");
     a.href = site.url;
-    a.innerHTML = site.svg;
+    // Use img tag for icon file reference, or fallback to inline SVG for legacy data
+    if (site.icon) {
+      const img = document.createElement('img');
+      img.src = site.icon;
+      img.alt = site.name;
+      img.className = 'dock-icon';
+      a.appendChild(img);
+    } else if (site.svg) {
+      // Legacy SVG support
+      a.innerHTML = site.svg;
+    }
     a.setAttribute("aria-label", site.name);
     a.setAttribute("title", site.name);
     a.target = currentSettings.linkTarget || "_blank";

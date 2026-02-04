@@ -59,6 +59,10 @@ const translations = {
         manage_dock_desc: '添加或删除 Dock 上的快捷方式。拖拽可调整顺序。',
         available_presets: '可用预设',
         all_presets_added: '所有预设已添加',
+        dock_site_exists: '已存在于 Dock 栏',
+        dock_limit_reached: 'Dock 栏最多只能添加 {max} 个站点',
+        dock_auto_enabled: 'Dock 栏已自动开启',
+        dock_empty_hidden: 'Dock 栏已清空并自动隐藏',
         
         // Actions
         save_settings: '保存设置',
@@ -169,6 +173,10 @@ const translations = {
         manage_dock_desc: 'Add or remove shortcuts. Drag to reorder.',
         available_presets: 'Available Presets',
         all_presets_added: 'All presets added',
+        dock_site_exists: 'already exists in Dock',
+        dock_limit_reached: 'Dock can only have up to {max} sites',
+        dock_auto_enabled: 'Dock has been enabled',
+        dock_empty_hidden: 'Dock is empty and hidden',
         
         // Actions
         save_settings: 'Save Settings',

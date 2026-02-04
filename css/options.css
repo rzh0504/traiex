@@ -753,7 +753,8 @@ select:focus {
   background: rgba(255, 255, 255, 0.05);
 }
 
-.dock-site-item svg {
+.dock-site-item svg,
+.dock-site-item img.dock-icon {
   width: 2rem;
   height: 2rem;
   fill: var(--primary-font-color);

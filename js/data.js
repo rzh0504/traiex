@@ -1,79 +1,151 @@
 /* Data and Default Configurations */
 
-// Default dock sites
+// Default dock sites (from preset_icons folder)
 const defaultDockSites = [
     {
-        name: 'Vercel',
-        url: 'https://vercel.com',
-        svg: '<svg role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><title>Vercel</title><path d="M24 22.525H0l12-21.05 12 21.05z"/></svg>'
-    },
-    {
-        name: 'Cloudflare',
-        url: 'https://www.cloudflare.com',
-        svg: '<svg role="img" viewBox="-2 -2 28 28" xmlns="http://www.w3.org/2000/svg"><title>Cloudflare</title><path d="M19.4 12c-.2-4.1-3.6-7.3-7.8-7.3-3.6 0-6.6 2.4-7.6 5.6-.4.1-.7.1-1.1.1-3.1 0-5.6 2.5-5.6 5.6 0 3.1 2.5 5.6 5.6 5.6h16c2.7 0 4.8-1.7 4.8-4.4 0-2.5-2.2-4.1-4.3-4.2z"/></svg>'
+        name: 'GitHub',
+        url: 'https://github.com',
+        icon: 'assets/preset_icons/github.svg'
     },
     {
         name: 'Gmail',
         url: 'https://mail.google.com',
-        svg: '<svg role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><title>Gmail</title><path d="M24 5.457v13.909c0 .904-.732 1.636-1.636 1.636h-3.819V11.73L12 16.64l-6.545-4.91v9.273H1.636A1.636 1.636 0 0 1 0 19.366V5.457c0-2.023 2.309-3.178 3.927-1.964L5.455 4.64 12 9.548l6.545-4.91 1.528-1.145C21.69 2.28 24 3.434 24 5.457z"/></svg>'
+        icon: 'assets/preset_icons/gmail.svg'
     },
     {
         name: 'YouTube',
         url: 'https://www.youtube.com',
-        svg: '<svg role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><title>YouTube</title><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>'
-    },
-    {
-        name: 'GitHub',
-        url: 'https://github.com',
-        svg: '<svg role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><title>GitHub</title><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg>'
-    },
-    {
-        name: 'Gemini',
-        url: 'https://gemini.google.com',
-        svg: '<svg role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><title>Google Gemini</title><path d="M12,0L14.5,9.5L24,12L14.5,14.5L12,24L9.5,14.5L0,12L9.5,9.5L12,0Z"/></svg>'
-    }
-    
-];
-
-// Presets (includes default plus extras)
-const dockSitePresets = [
-    ...defaultDockSites,
-    {
-        name: 'Google Calendar',
-        url: 'https://calendar.google.com',
-        svg: '<svg role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><title>Google Calendar</title><path d="M22 6V4h-3V1h-2v3H7V1H5v3H2v19h20V6zM5 6h14v2H5V6zm15 12H4V10h16v8z"/></svg>' 
-    },
-    {
-        name: 'Google Keep',
-        url: 'https://keep.google.com',
-        svg: '<svg role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><title>Google Keep</title><path d="M9 21c0 .55.45 1 1 1h4c.55 0 1-.45 1-1v-1H9v1zm3-19C8.14 2 5 5.14 5 9c0 2.38 1.19 4.47 3 5.74V17c0 .55.45 1 1 1h6c.55 0 1-.45 1-1v-2.26c1.81-1.27 3-3.36 3-5.74 0-3.86-3.14-7-7-7zm2.85 11.1l-.85.6V16h-4v-2.3l-.85-.6C7.8 12.16 7 10.63 7 9c0-2.76 2.24-5 5-5s5 2.24 5 5c0 1.63-.8 3.16-2.15 4.1z"/></svg>' 
+        icon: 'assets/preset_icons/youtube.svg'
     },
     {
         name: 'ChatGPT',
         url: 'https://chat.openai.com',
-        svg: '<svg role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><title>ChatGPT</title><path d="M22.282 9.821a5.985 5.985 0 0 0-.516-4.91 6.046 6.046 0 0 0-6.51-2.9A6.065 6.065 0 0 0 4.981 4.18a5.985 5.985 0 0 0-3.998 2.9 6.046 6.046 0 0 0 .743 7.097 5.98 5.98 0 0 0 .51 4.911 6.051 6.051 0 0 0 6.515 2.9A5.985 5.985 0 0 0 13.26 24a6.056 6.056 0 0 0 5.772-4.206 5.99 5.99 0 0 0 3.997-2.9 6.056 6.056 0 0 0-.747-7.073zM13.26 22.43a4.476 4.476 0 0 1-2.876-1.04l.141-.081 4.779-2.758a.795.795 0 0 0 .392-.681v-6.737l2.02 1.168a.071.071 0 0 1 .038.052v5.583a4.504 4.504 0 0 1-4.494 4.494zM3.6 18.304a4.47 4.47 0 0 1-.535-3.014l.142.085 4.783 2.759a.771.771 0 0 0 .78 0l5.843-3.369v2.332a.08.08 0 0 1-.033.062L9.74 19.95a4.5 4.5 0 0 1-6.14-1.646zM2.34 7.896a4.485 4.485 0 0 1 2.366-1.973V11.6a.766.766 0 0 0 .388.676l5.815 3.355-2.02 1.168a.076.076 0 0 1-.071 0l-4.83-2.786A4.504 4.504 0 0 1 2.34 7.896zm16.597 3.855l-5.833-3.387L15.119 7.2a.076.076 0 0 1 .071 0l4.83 2.791a4.494 4.494 0 0 1-.676 8.105v-5.678a.79.79 0 0 0-.407-.667zm2.01-3.023l-.141-.085-4.774-2.782a.776.776 0 0 0-.785 0L9.409 9.23V6.897a.066.066 0 0 1 .028-.061l4.83-2.787a4.5 4.5 0 0 1 6.68 4.66zm-12.64 4.135l-2.02-1.164a.08.08 0 0 1-.038-.057V6.075a4.5 4.5 0 0 1 7.375-3.453l-.142.08L8.704 5.46a.795.795 0 0 0-.393.681zm1.097-2.365l2.602-1.5 2.607 1.5v2.999l-2.597 1.5-2.607-1.5z"/></svg>'
+        icon: 'assets/preset_icons/openai.svg'
     },
-
+    {
+        name: 'Gemini',
+        url: 'https://gemini.google.com',
+        icon: 'assets/preset_icons/gemini.svg'
+    },
     {
         name: 'Claude',
         url: 'https://claude.ai',
-        svg: '<svg role="img" viewBox="0 0 50 50" xmlns="http://www.w3.org/2000/svg"><title>Claude</title><path d="M19.861,27.625v-0.716l-16.65-0.681L2.07,25.985	L1,24.575l0.11-0.703l0.959-0.645l17.95,1.345l0.11-0.314L5.716,14.365l-0.729-0.924l-0.314-2.016L5.985,9.98l2.214,0.24	l11.312,8.602l0.327-0.353L12.623,5.977c0,0-0.548-2.175-0.548-2.697l1.494-2.029l0.827-0.266l2.833,0.995l7.935,17.331h0.314	l1.348-14.819l0.752-1.822l1.494-0.985l1.167,0.557l0.959,1.374l-2.551,14.294h0.425l0.486-0.486l8.434-10.197l1.092-0.862h2.065	l1.52,2.259l-0.681,2.334l-7.996,11.108l0.146,0.217l0.376-0.036l12.479-2.405l1.666,0.778l0.182,0.791l-0.655,1.617l-15.435,3.523	l-0.084,0.062l0.097,0.12l13.711,0.814l1.578,1.044L49,29.868l-0.159,0.972l-2.431,1.238l-13.561-3.254h-0.363v0.217l11.218,10.427	l0.256,1.154l-0.645,0.911l-0.681-0.097l-9.967-8.058h-0.256v0.34l5.578,8.35l0.243,2.162l-0.34,0.703l-1.215,0.425l-1.335-0.243	l-7.863-12.083l-0.279,0.159l-1.348,14.524l-0.632,0.742l-1.459,0.558l-1.215-0.924L21.9,46.597l2.966-14.939l-0.023-0.084	l-0.279,0.036L13.881,45.138l-0.827,0.327l-1.433-0.742l0.133-1.326l0.801-1.18l9.52-12.019l-0.013-0.314h-0.11l-12.69,8.239	l-2.259,0.292L6.03,37.505l0.12-1.494l0.46-0.486L19.861,27.625z"></path></svg>'
+        icon: 'assets/preset_icons/claude.svg'
+    }
+];
+
+// All available presets (only from preset_icons folder)
+const dockSitePresets = [
+    {
+        name: 'GitHub',
+        url: 'https://github.com',
+        icon: 'assets/preset_icons/github.svg'
     },
     {
-        name: 'Twitter',
-        url: 'https://twitter.com',
-        svg: '<svg role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><title>X</title><path d="M18.901 1.153h3.68l-8.04 9.19L24 22.846h-7.406l-5.8-7.584-6.638 7.584H.474l8.6-9.83L0 1.154h7.594l5.243 6.932ZM17.61 20.644h2.039L6.486 3.24H4.298Z"/></svg>'
+        name: 'Gmail',
+        url: 'https://mail.google.com',
+        icon: 'assets/preset_icons/gmail.svg'
+    },
+    {
+        name: 'YouTube',
+        url: 'https://www.youtube.com',
+        icon: 'assets/preset_icons/youtube.svg'
+    },
+    {
+        name: 'ChatGPT',
+        url: 'https://chat.openai.com',
+        icon: 'assets/preset_icons/openai.svg'
+    },
+    {
+        name: 'Gemini',
+        url: 'https://gemini.google.com',
+        icon: 'assets/preset_icons/gemini.svg'
+    },
+    {
+        name: 'Claude',
+        url: 'https://claude.ai',
+        icon: 'assets/preset_icons/claude.svg'
+    },
+    {
+        name: 'Vercel',
+        url: 'https://vercel.com',
+        icon: 'assets/preset_icons/vercel.svg'
+    },
+    {
+        name: 'Cloudflare',
+        url: 'https://www.cloudflare.com',
+        icon: 'assets/preset_icons/cloudflare.svg'
+    },
+    {
+        name: 'X',
+        url: 'https://x.com',
+        icon: 'assets/preset_icons/x.svg'
     },
     {
         name: 'Reddit',
         url: 'https://www.reddit.com',
-        svg: '<svg role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><title>Reddit</title><path d="M12 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0zm5.01 4.744c.688 0 1.25.561 1.25 1.249a1.25 1.25 0 0 1-2.498.056l-2.597-.547-.8 3.747c1.824.07 3.48.632 4.674 1.488.308-.309.73-.491 1.207-.491.968 0 1.754.786 1.754 1.754 0 .716-.435 1.333-1.01 1.614a3.111 3.111 0 0 1 .042.52c0 2.694-3.13 4.87-7.004 4.87-3.874 0-7.004-2.176-7.004-4.87 0-.183.015-.366.043-.534A1.748 1.748 0 0 1 4.028 12c0-.968.786-1.754 1.754-1.754.463 0 .898.196 1.207.49 1.207-.883 2.878-1.43 4.744-1.487l.885-4.182a.342.342 0 0 1 .14-.197.35.35 0 0 1 .238-.042l2.906.617a1.214 1.214 0 0 1 1.108-.701zM9.25 12C8.561 12 8 12.562 8 13.25c0 .687.561 1.248 1.25 1.248.687 0 1.248-.561 1.248-1.249 0-.688-.561-1.249-1.249-1.249zm5.5 0c-.687 0-1.248.561-1.248 1.25 0 .687.561 1.248 1.249 1.248.688 0 1.249-.561 1.249-1.249 0-.687-.562-1.249-1.25-1.249zm-5.466 3.99a.327.327 0 0 0-.231.094.33.33 0 0 0 0 .463c.842.842 2.484.913 2.961.913.477 0 2.105-.056 2.961-.913a.361.361 0 0 0 .029-.463.33.33 0 0 0-.464 0c-.547.533-1.684.73-2.512.73-.828 0-1.979-.196-2.512-.73a.326.326 0 0 0-.232-.095z"/></svg>'
+        icon: 'assets/preset_icons/reddit.svg'
     },
     {
         name: 'Instagram',
         url: 'https://www.instagram.com',
-        svg: '<svg role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><title>Instagram</title><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>'
+        icon: 'assets/preset_icons/Instagram.svg'
     },
+    {
+        name: 'Discord',
+        url: 'https://discord.com',
+        icon: 'assets/preset_icons/discord.svg'
+    },
+    {
+        name: 'TikTok',
+        url: 'https://www.tiktok.com',
+        icon: 'assets/preset_icons/tiktok.svg'
+    },
+    {
+        name: 'Netflix',
+        url: 'https://www.netflix.com',
+        icon: 'assets/preset_icons/netflix.svg'
+    },
+    {
+        name: 'Spotify',
+        url: 'https://open.spotify.com',
+        icon: 'assets/preset_icons/spotify.svg'
+    },
+    {
+        name: 'Notion',
+        url: 'https://www.notion.so',
+        icon: 'assets/preset_icons/notion.svg'
+    },
+    {
+        name: 'Google Drive',
+        url: 'https://drive.google.com',
+        icon: 'assets/preset_icons/googledrive.svg'
+    },
+    {
+        name: 'Microsoft',
+        url: 'https://www.microsoft.com',
+        icon: 'assets/preset_icons/microsoft.svg'
+    },
+    {
+        name: 'LinuxDo',
+        url: 'https://linux.do',
+        icon: 'assets/preset_icons/linuxdo.svg'
+    },
+    {
+        name: 'QQ音乐',
+        url: 'https://y.qq.com',
+        icon: 'assets/preset_icons/qqmusic.svg'
+    },
+    {
+        name: '网易云音乐',
+        url: 'https://music.163.com',
+        icon: 'assets/preset_icons/netease.svg'
+    },
+    {
+        name: '淘宝',
+        url: 'https://www.taobao.com',
+        icon: 'assets/preset_icons/taobao.svg'
+    }
 ];
 
 // Default bookmark categories (matching original 4-column layout)

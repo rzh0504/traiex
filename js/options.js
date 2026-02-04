@@ -414,7 +414,16 @@ function renderDockManager() {
       const el = document.createElement('div');
       el.className = 'dock-site-item';
       el.title = `拖拽排序 | 点击移除 ${site.name}`;
-      el.innerHTML = site.svg;
+      // Use img tag for icon file reference, or fallback to inline SVG for legacy data
+      if (site.icon) {
+        const img = document.createElement('img');
+        img.src = site.icon;
+        img.alt = site.name;
+        img.className = 'dock-icon';
+        el.appendChild(img);
+      } else if (site.svg) {
+        el.innerHTML = site.svg;
+      }
       el.dataset.index = index;
       
       // Drag and drop for reordering
@@ -463,19 +472,37 @@ function renderDockManager() {
       const el = document.createElement('div');
       el.className = 'dock-site-item';
       el.title = `添加 ${preset.name}`;
-      el.innerHTML = preset.svg;
+      // Use img tag for icon file reference, or fallback to inline SVG for legacy data
+      if (preset.icon) {
+        const img = document.createElement('img');
+        img.src = preset.icon;
+        img.alt = preset.name;
+        img.className = 'dock-icon';
+        el.appendChild(img);
+      } else if (preset.svg) {
+        el.innerHTML = preset.svg;
+      }
       el.addEventListener('click', () => addDockSite(preset));
       presetDockContainer.appendChild(el);
     });
   }
 }
 
+// Max dock sites limit
+const MAX_DOCK_SITES = 10;
+
 // Add dock site
 function addDockSite(site) {
+  // Check max limit
+  if (currentDockSites.length >= MAX_DOCK_SITES) {
+    showToast(t('dock_limit_reached').replace('{max}', MAX_DOCK_SITES), 'warning');
+    return;
+  }
+
   // Check for duplicates based on URL
   const exists = currentDockSites.some(s => s.url === site.url);
   if (exists) {
-    showToast(`${site.name} 已存在于 Dock 栏`, 'warning');
+    showToast(`${site.name} ${t('dock_site_exists')}`, 'warning');
     return;
   }
 
@@ -485,7 +512,7 @@ function addDockSite(site) {
   // Auto-enable dock if it was empty (optional user experience enhancement)
   if (currentDockSites.length === 1 && !showDockCheckbox.checked) {
     showDockCheckbox.checked = true;
-    showToast('Dock 栏已自动开启', 'success');
+    showToast(t('dock_auto_enabled'), 'success');
   }
 }
 
@@ -497,7 +524,7 @@ function removeDockSite(index) {
   // Auto hide dock if empty
   if (currentDockSites.length === 0) {
     showDockCheckbox.checked = false;
-    showToast('Dock 栏已清空并自动隐藏', 'warning');
+    showToast(t('dock_empty_hidden'), 'warning');
   }
 }
 

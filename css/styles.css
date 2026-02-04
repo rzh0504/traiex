@@ -145,7 +145,8 @@ aside svg { height: 4.5rem; }
     flex-shrink: 0;
 }
 
-#dock svg {
+#dock svg,
+#dock img.dock-icon {
     height: 2.5rem;
     width: 2.5rem;
     overflow: visible;
