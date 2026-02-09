@@ -10,8 +10,8 @@ const defaultSettings = {
   searchEngine: "google",
   theme: "auto",
   lightBgColor: "#DDE2EF",
-  searchBorderRadius: 8,
-  bookmarksFontWeight: 550,
+  searchBorderRadius: 20,
+  bookmarksFontWeight: 400,
   linkTarget: "_blank", // '_blank' for new tab, '_self' for same tab
   showDockLabels: false, // Show text labels under dock icons
   language: "zh-CN", // 'zh-CN' for Chinese, 'en' for English
