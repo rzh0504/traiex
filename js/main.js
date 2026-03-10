@@ -620,26 +620,36 @@ function setupBookmarkDragReorder(container) {
   }
 
   function clearDragClasses() {
-    container.querySelectorAll("li").forEach((li) => {
-      li.classList.remove("bm-drag-over-top", "bm-drag-over-bottom");
+    container.querySelectorAll("li, ul").forEach((el) => {
+      el.classList.remove(
+        "bm-drag-over-top",
+        "bm-drag-over-bottom",
+        "bm-drag-over-ul",
+      );
     });
   }
 
   function saveNewOrder() {
-    const categories = getCategories();
+    const liveCategories = getCategories();
+    // Create a deep copy of the original state before we start mutating it
+    // otherwise reading from srcCats during the loop will fail when previous
+    // categories have already had their .bookmarks array replaced.
+    const snapshotCats = structuredClone(liveCategories);
+    const newCategoriesData = structuredClone(liveCategories);
+
     const uls = container.querySelectorAll("ul");
     uls.forEach((ul, catIdx) => {
-      if (!categories[catIdx]) return;
+      if (!newCategoriesData[catIdx]) return;
       const newBookmarks = [];
       ul.querySelectorAll("li:not(.category-header-item)").forEach((li) => {
         const origCat = parseInt(li.dataset.catIndex);
         const origBm = parseInt(li.dataset.bmIndex);
-        const srcCats = getCategories();
-        if (srcCats[origCat] && srcCats[origCat].bookmarks[origBm]) {
-          newBookmarks.push(srcCats[origCat].bookmarks[origBm]);
+
+        if (snapshotCats[origCat] && snapshotCats[origCat].bookmarks[origBm]) {
+          newBookmarks.push(snapshotCats[origCat].bookmarks[origBm]);
         }
       });
-      categories[catIdx].bookmarks = newBookmarks;
+      newCategoriesData[catIdx].bookmarks = newBookmarks;
     });
 
     // Update data attributes
@@ -653,9 +663,9 @@ function setupBookmarkDragReorder(container) {
       );
     });
 
-    bookmarkCategories = categories;
-    currentSettings.bookmarkCategories = categories;
-    chrome.storage.sync.set({ bookmarkCategories: categories });
+    bookmarkCategories = newCategoriesData;
+    currentSettings.bookmarkCategories = newCategoriesData;
+    chrome.storage.sync.set({ bookmarkCategories: newCategoriesData });
   }
 
   // --- Enter/Exit edit mode ---
@@ -767,34 +777,56 @@ function setupBookmarkDragReorder(container) {
     if (!isEditMode || !dragSrcEl) return;
     e.preventDefault();
     e.dataTransfer.dropEffect = "move";
+
     const li = e.target.closest("#bookmarks li");
-    if (!li || !isBookmarkLi(li) || li === dragSrcEl) {
+    const ul = e.target.closest("#bookmarks ul");
+
+    if (li && isBookmarkLi(li) && li === dragSrcEl) {
       clearDragClasses();
       return;
     }
+
     clearDragClasses();
-    const rect = li.getBoundingClientRect();
-    const midY = rect.top + rect.height / 2;
-    if (e.clientY < midY) {
-      li.classList.add("bm-drag-over-top");
-    } else {
-      li.classList.add("bm-drag-over-bottom");
+
+    if (li && isBookmarkLi(li)) {
+      const rect = li.getBoundingClientRect();
+      const midY = rect.top + rect.height / 2;
+      if (e.clientY < midY) {
+        li.classList.add("bm-drag-over-top");
+      } else {
+        li.classList.add("bm-drag-over-bottom");
+      }
+    } else if (ul || (li && li.classList.contains("category-header-item"))) {
+      const targetUl = ul || li.closest("ul");
+      targetUl.classList.add("bm-drag-over-ul");
     }
   });
 
   container.addEventListener("drop", (e) => {
     if (!isEditMode || !dragSrcEl) return;
     e.preventDefault();
+
     const li = e.target.closest("#bookmarks li");
-    if (!li || !isBookmarkLi(li) || li === dragSrcEl) return;
-    const ul = li.closest("ul");
-    const rect = li.getBoundingClientRect();
-    const midY = rect.top + rect.height / 2;
-    if (e.clientY < midY) {
-      ul.insertBefore(dragSrcEl, li);
+    const ul = e.target.closest("#bookmarks ul");
+
+    if (li && isBookmarkLi(li) && li === dragSrcEl) return;
+
+    const targetUl = ul || (li ? li.closest("ul") : null);
+    if (!targetUl) return;
+
+    if (li && isBookmarkLi(li)) {
+      const rect = li.getBoundingClientRect();
+      const midY = rect.top + rect.height / 2;
+      if (e.clientY < midY) {
+        targetUl.insertBefore(dragSrcEl, li);
+      } else {
+        targetUl.insertBefore(dragSrcEl, li.nextSibling);
+      }
     } else {
-      ul.insertBefore(dragSrcEl, li.nextSibling);
+      // Drop into empty category or on header
+      targetUl.appendChild(dragSrcEl);
     }
+
     saveNewOrder();
   });
 
@@ -840,9 +872,11 @@ function setupBookmarkDragReorder(container) {
       if (touchDragEl) touchDragEl.style.display = "";
 
       const targetLi = elemBelow?.closest("#bookmarks li");
+      const targetUl = elemBelow?.closest("#bookmarks ul");
       clearDragClasses();
+
       if (targetLi && isBookmarkLi(targetLi) && targetLi !== dragSrcEl) {
-        touchCurrentTarget = targetLi;
+        touchCurrentTarget = { el: targetLi, type: "li" };
         const rect = targetLi.getBoundingClientRect();
         const midY = rect.top + rect.height / 2;
         if (touch.clientY < midY) {
@@ -850,6 +884,13 @@ function setupBookmarkDragReorder(container) {
         } else {
           targetLi.classList.add("bm-drag-over-bottom");
         }
+      } else if (
+        targetUl ||
+        (targetLi && targetLi.classList.contains("category-header-item"))
+      ) {
+        const theUl = targetUl || targetLi.closest("ul");
+        touchCurrentTarget = { el: theUl, type: "ul" };
+        theUl.classList.add("bm-drag-over-ul");
       } else {
         touchCurrentTarget = null;
       }
@@ -859,16 +900,23 @@ function setupBookmarkDragReorder(container) {
 
   container.addEventListener("touchend", (e) => {
     if (!isEditMode || !dragSrcEl) return;
-    if (touchCurrentTarget && touchCurrentTarget !== dragSrcEl) {
-      const ul = touchCurrentTarget.closest("ul");
-      const lastTouch = e.changedTouches[0];
-      const rect = touchCurrentTarget.getBoundingClientRect();
-      const midY = rect.top + rect.height / 2;
-      if (lastTouch.clientY < midY) {
-        ul.insertBefore(dragSrcEl, touchCurrentTarget);
-      } else {
-        ul.insertBefore(dragSrcEl, touchCurrentTarget.nextSibling);
+    if (touchCurrentTarget && touchCurrentTarget.el !== dragSrcEl) {
+      const targetEl = touchCurrentTarget.el;
+
+      if (touchCurrentTarget.type === "li") {
+        const ul = targetEl.closest("ul");
+        const lastTouch = e.changedTouches[0];
+        const rect = targetEl.getBoundingClientRect();
+        const midY = rect.top + rect.height / 2;
+        if (lastTouch.clientY < midY) {
+          ul.insertBefore(dragSrcEl, targetEl);
+        } else {
+          ul.insertBefore(dragSrcEl, targetEl.nextSibling);
+        }
+      } else if (touchCurrentTarget.type === "ul") {
+        targetEl.appendChild(dragSrcEl);
       }
+
       saveNewOrder();
     }
     dragSrcEl.classList.remove("bm-dragging");

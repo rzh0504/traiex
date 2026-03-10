@@ -563,6 +563,14 @@ aside svg {
   -webkit-touch-callout: none;
 }
 
+/* Make empty ul or ul with only header a better drop target in edit mode */
+#bookmarks.bookmark-edit-mode ul {
+  min-height: 4rem;
+  padding-bottom: 2rem;
+  border-radius: 0.5rem;
+  transition: background-color 0.2s ease, box-shadow 0.2s ease;
+}
+
 #bookmarks.bookmark-edit-mode li:not(.category-header-item) {
   cursor: grab;
   position: relative;
@@ -614,6 +622,11 @@ aside svg {
   border-radius: 2px;
   background: var(--color-theme-accent, #4a90d9);
   box-shadow: 0 0 6px var(--color-theme-accent, #4a90d9);
+}
+
+#bookmarks ul.bm-drag-over-ul {
+  background-color: hsl(var(--color-theme-accent-hsl) / 0.08);
+  box-shadow: inset 0 0 0 2px var(--color-theme-accent, #4a90d9);
 }
 
 @keyframes bookmark-wiggle {
