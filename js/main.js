@@ -175,6 +175,7 @@ function dateTime() {
 // Render Dock Sites
 function renderDock() {
   const dockContainer = document.getElementById("dock");
+  const isEditMode = dockContainer.classList.contains("dock-edit-mode");
   const ul = document.createElement("ul");
 
   // Add class for labels if enabled
@@ -193,6 +194,8 @@ function renderDock() {
   sites.forEach((site, index) => {
     const li = document.createElement("li");
     li.dataset.index = index;
+    if (isEditMode) li.setAttribute("draggable", "true");
+
     const a = document.createElement("a");
     a.href = site.url;
     // Use img tag for icon file reference, or fallback to inline SVG for legacy data
@@ -229,9 +232,6 @@ function renderDock() {
 
   dockContainer.innerHTML = "";
   dockContainer.appendChild(ul);
-
-  // Setup long-press drag reorder
-  setupDockDragReorder(dockContainer);
 }
 
 // Dock long-press drag reorder
@@ -532,6 +532,8 @@ function setupDockDragReorder(dockContainer) {
 // Render Bookmarks (categorized layout)
 function renderBookmarks() {
   const bookmarksContainer = document.getElementById("bookmarks");
+  const isEditMode =
+    bookmarksContainer.classList.contains("bookmark-edit-mode");
   bookmarksContainer.innerHTML = "";
 
   // Use stored categories or defaults
@@ -545,8 +547,9 @@ function renderBookmarks() {
   bookmarksContainer.dataset.columns = categories.length;
 
   // Render each category as a column (ul)
-  categories.forEach((category) => {
+  categories.forEach((category, catIndex) => {
     const ul = document.createElement("ul");
+    ul.dataset.catIndex = catIndex;
 
     // Category name as first item (optional - styled differently)
     if (category.name) {
@@ -557,8 +560,12 @@ function renderBookmarks() {
     }
 
     // Render bookmarks
-    category.bookmarks.forEach((bookmark) => {
+    category.bookmarks.forEach((bookmark, bmIndex) => {
       const li = document.createElement("li");
+      li.dataset.catIndex = catIndex;
+      li.dataset.bmIndex = bmIndex;
+      if (isEditMode) li.setAttribute("draggable", "true");
+
       const a = document.createElement("a");
       a.href = bookmark.url;
       a.target = currentSettings.linkTarget || "_blank";
@@ -587,6 +594,307 @@ function renderBookmarks() {
 
     bookmarksContainer.appendChild(ul);
   });
+}
+
+// Bookmark long-press drag reorder
+function setupBookmarkDragReorder(container) {
+  const LONG_PRESS_DURATION = 500;
+  let longPressTimer = null;
+  let isEditMode = false;
+  let dragSrcEl = null;
+  let touchDragEl = null;
+  let touchCurrentTarget = null;
+  let touchStartX = 0;
+  let touchStartY = 0;
+
+  function getCategories() {
+    return bookmarkCategories || defaultBookmarkCategories;
+  }
+
+  function isBookmarkLi(el) {
+    return (
+      el &&
+      el.tagName === "LI" &&
+      !el.classList.contains("category-header-item")
+    );
+  }
+
+  function clearDragClasses() {
+    container.querySelectorAll("li").forEach((li) => {
+      li.classList.remove("bm-drag-over-top", "bm-drag-over-bottom");
+    });
+  }
+
+  function saveNewOrder() {
+    const categories = getCategories();
+    const uls = container.querySelectorAll("ul");
+    uls.forEach((ul, catIdx) => {
+      if (!categories[catIdx]) return;
+      const newBookmarks = [];
+      ul.querySelectorAll("li:not(.category-header-item)").forEach((li) => {
+        const origCat = parseInt(li.dataset.catIndex);
+        const origBm = parseInt(li.dataset.bmIndex);
+        const srcCats = getCategories();
+        if (srcCats[origCat] && srcCats[origCat].bookmarks[origBm]) {
+          newBookmarks.push(srcCats[origCat].bookmarks[origBm]);
+        }
+      });
+      categories[catIdx].bookmarks = newBookmarks;
+    });
+
+    // Update data attributes
+    uls.forEach((ul, catIdx) => {
+      ul.dataset.catIndex = catIdx;
+      ul.querySelectorAll("li:not(.category-header-item)").forEach(
+        (li, bmIdx) => {
+          li.dataset.catIndex = catIdx;
+          li.dataset.bmIndex = bmIdx;
+        },
+      );
+    });
+
+    bookmarkCategories = categories;
+    currentSettings.bookmarkCategories = categories;
+    chrome.storage.sync.set({ bookmarkCategories: categories });
+  }
+
+  // --- Enter/Exit edit mode ---
+  function enterEditMode() {
+    if (isEditMode) return;
+    isEditMode = true;
+
+    // Clear any text selection and active focus
+    window.getSelection()?.removeAllRanges();
+    if (document.activeElement) document.activeElement.blur();
+
+    container.classList.add("bookmark-edit-mode");
+    container
+      .querySelectorAll("li:not(.category-header-item)")
+      .forEach((li) => {
+        li.setAttribute("draggable", "true");
+      });
+    setTimeout(() => {
+      document.addEventListener("click", exitOnOutsideClick);
+      document.addEventListener("keydown", exitOnEscape);
+    }, 10);
+  }
+
+  function exitEditMode() {
+    if (!isEditMode) return;
+    isEditMode = false;
+    container.classList.remove("bookmark-edit-mode");
+    clearDragClasses();
+    container
+      .querySelectorAll("li:not(.category-header-item)")
+      .forEach((li) => {
+        li.removeAttribute("draggable");
+        li.classList.remove("bm-dragging");
+      });
+    document.removeEventListener("click", exitOnOutsideClick);
+    document.removeEventListener("keydown", exitOnEscape);
+  }
+
+  function exitOnOutsideClick(e) {
+    if (!container.contains(e.target)) exitEditMode();
+  }
+  function exitOnEscape(e) {
+    if (e.key === "Escape") exitEditMode();
+  }
+
+  // --- Long press detection ---
+  function cancelLongPress() {
+    if (longPressTimer) {
+      clearTimeout(longPressTimer);
+      longPressTimer = null;
+    }
+  }
+
+  container.addEventListener("pointerdown", (e) => {
+    const li = e.target.closest("#bookmarks li");
+    if (!li || !isBookmarkLi(li)) return;
+
+    if (e.button === 2) return; // Ignore right click
+
+    cancelLongPress();
+    touchStartX = e.clientX;
+    touchStartY = e.clientY;
+
+    longPressTimer = setTimeout(() => {
+      longPressTimer = null;
+      enterEditMode();
+      li.querySelector("a")?.addEventListener("click", preventClick, {
+        once: true,
+      });
+    }, LONG_PRESS_DURATION);
+  });
+
+  container.addEventListener("pointerup", cancelLongPress);
+  container.addEventListener("pointerleave", cancelLongPress);
+  container.addEventListener("pointermove", (e) => {
+    if (longPressTimer) {
+      if (
+        Math.abs(e.clientX - touchStartX) > 10 ||
+        Math.abs(e.clientY - touchStartY) > 10
+      ) {
+        cancelLongPress();
+      }
+    }
+  });
+
+  function preventClick(e) {
+    e.preventDefault();
+    e.stopPropagation();
+  }
+
+  // --- HTML5 Drag & Drop ---
+  container.addEventListener("dragstart", (e) => {
+    if (!isEditMode) {
+      e.preventDefault();
+      return;
+    }
+    const li = e.target.closest("#bookmarks li");
+    if (!li || !isBookmarkLi(li)) {
+      e.preventDefault();
+      return;
+    }
+    dragSrcEl = li;
+    li.classList.add("bm-dragging");
+    e.dataTransfer.effectAllowed = "move";
+    e.dataTransfer.setData("text/plain", "bookmark");
+  });
+
+  container.addEventListener("dragover", (e) => {
+    if (!isEditMode || !dragSrcEl) return;
+    e.preventDefault();
+    e.dataTransfer.dropEffect = "move";
+    const li = e.target.closest("#bookmarks li");
+    if (!li || !isBookmarkLi(li) || li === dragSrcEl) {
+      clearDragClasses();
+      return;
+    }
+    clearDragClasses();
+    const rect = li.getBoundingClientRect();
+    const midY = rect.top + rect.height / 2;
+    if (e.clientY < midY) {
+      li.classList.add("bm-drag-over-top");
+    } else {
+      li.classList.add("bm-drag-over-bottom");
+    }
+  });
+
+  container.addEventListener("drop", (e) => {
+    if (!isEditMode || !dragSrcEl) return;
+    e.preventDefault();
+    const li = e.target.closest("#bookmarks li");
+    if (!li || !isBookmarkLi(li) || li === dragSrcEl) return;
+    const ul = li.closest("ul");
+    const rect = li.getBoundingClientRect();
+    const midY = rect.top + rect.height / 2;
+    if (e.clientY < midY) {
+      ul.insertBefore(dragSrcEl, li);
+    } else {
+      ul.insertBefore(dragSrcEl, li.nextSibling);
+    }
+    saveNewOrder();
+  });
+
+  container.addEventListener("dragend", () => {
+    if (dragSrcEl) {
+      dragSrcEl.classList.remove("bm-dragging");
+      dragSrcEl = null;
+    }
+    clearDragClasses();
+  });
+
+  // --- Touch drag support ---
+  container.addEventListener(
+    "touchmove",
+    (e) => {
+      if (!isEditMode) return;
+      const li = e.target.closest("#bookmarks li");
+      if (li && isBookmarkLi(li) && !dragSrcEl) {
+        dragSrcEl = li;
+        li.classList.add("bm-dragging");
+      }
+      if (!dragSrcEl) return;
+      e.preventDefault();
+      const touch = e.touches[0];
+
+      if (!touchDragEl) {
+        touchDragEl = dragSrcEl.cloneNode(true);
+        touchDragEl.style.cssText = `
+        position: fixed; z-index: 9999; pointer-events: none;
+        opacity: 0.8; transform: scale(1.05);
+        left: ${touch.clientX - 50}px; top: ${touch.clientY - 15}px;
+        background: var(--primary-background-color); border-radius: 0.25rem;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+      `;
+        document.body.appendChild(touchDragEl);
+      } else {
+        touchDragEl.style.left = touch.clientX - 50 + "px";
+        touchDragEl.style.top = touch.clientY - 15 + "px";
+      }
+
+      if (touchDragEl) touchDragEl.style.display = "none";
+      const elemBelow = document.elementFromPoint(touch.clientX, touch.clientY);
+      if (touchDragEl) touchDragEl.style.display = "";
+
+      const targetLi = elemBelow?.closest("#bookmarks li");
+      clearDragClasses();
+      if (targetLi && isBookmarkLi(targetLi) && targetLi !== dragSrcEl) {
+        touchCurrentTarget = targetLi;
+        const rect = targetLi.getBoundingClientRect();
+        const midY = rect.top + rect.height / 2;
+        if (touch.clientY < midY) {
+          targetLi.classList.add("bm-drag-over-top");
+        } else {
+          targetLi.classList.add("bm-drag-over-bottom");
+        }
+      } else {
+        touchCurrentTarget = null;
+      }
+    },
+    { passive: false },
+  );
+
+  container.addEventListener("touchend", (e) => {
+    if (!isEditMode || !dragSrcEl) return;
+    if (touchCurrentTarget && touchCurrentTarget !== dragSrcEl) {
+      const ul = touchCurrentTarget.closest("ul");
+      const lastTouch = e.changedTouches[0];
+      const rect = touchCurrentTarget.getBoundingClientRect();
+      const midY = rect.top + rect.height / 2;
+      if (lastTouch.clientY < midY) {
+        ul.insertBefore(dragSrcEl, touchCurrentTarget);
+      } else {
+        ul.insertBefore(dragSrcEl, touchCurrentTarget.nextSibling);
+      }
+      saveNewOrder();
+    }
+    dragSrcEl.classList.remove("bm-dragging");
+    dragSrcEl = null;
+    touchCurrentTarget = null;
+    clearDragClasses();
+    if (touchDragEl) {
+      touchDragEl.remove();
+      touchDragEl = null;
+    }
+  });
+
+  // Block link clicks in edit mode
+  container.addEventListener(
+    "click",
+    (e) => {
+      if (isEditMode) {
+        const a = e.target.closest("#bookmarks a");
+        if (a) {
+          e.preventDefault();
+          e.stopPropagation();
+        }
+      }
+    },
+    true,
+  );
 }
 
 // Search history functions
@@ -1029,6 +1337,10 @@ async function traichu() {
   renderDock();
   renderBookmarks();
   setupSearch();
+
+  // Setup drag reorder (only once per page load)
+  setupDockDragReorder(document.getElementById("dock"));
+  setupBookmarkDragReorder(document.getElementById("bookmarks"));
 
   // Apply settings (visibility, theme, search engine)
   applySettings(settings);

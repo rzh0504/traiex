@@ -551,6 +551,70 @@ aside svg {
   outline: none;
 }
 
+/* Bookmark drag reorder styles */
+#bookmarks.bookmark-edit-mode {
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+#bookmarks.bookmark-edit-mode a {
+  pointer-events: none;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
+}
+
+#bookmarks.bookmark-edit-mode li:not(.category-header-item) {
+  cursor: grab;
+  position: relative;
+  border-radius: 0.25rem;
+  transition: all 0.2s ease;
+}
+
+#bookmarks.bookmark-edit-mode li:not(.category-header-item):hover {
+  background-color: hsl(var(--color-theme-accent-hsl) / 0.1);
+  transform: translateX(4px);
+}
+
+#bookmarks.bookmark-edit-mode li:not(.category-header-item):active {
+  background-color: hsl(var(--color-theme-accent-hsl) / 0.2);
+  transform: scale(0.98);
+}
+
+#bookmarks li.bm-dragging {
+  opacity: 0.8;
+  background-color: hsl(var(--color-theme-accent-hsl) / 0.15) !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transform: scale(1.02) !important;
+  cursor: grabbing !important;
+  z-index: 10;
+}
+
+#bookmarks li.bm-drag-over-top::before {
+  content: '';
+  position: absolute;
+  left: var(--spacing-m);
+  right: var(--spacing-m);
+  top: -2px;
+  height: 3px;
+  border-radius: 2px;
+  background: var(--color-theme-accent, #4a90d9);
+  box-shadow: 0 0 6px var(--color-theme-accent, #4a90d9);
+}
+
+#bookmarks li.bm-drag-over-bottom::after {
+  content: '';
+  position: absolute;
+  left: var(--spacing-m);
+  right: var(--spacing-m);
+  bottom: -2px;
+  height: 3px;
+  border-radius: 2px;
+  background: var(--color-theme-accent, #4a90d9);
+  box-shadow: 0 0 6px var(--color-theme-accent, #4a90d9);
+}
+
+
+
 /*
     Accessible hiding for screen readers
     https://webaim.org/techniques/css/invisiblecontent/#techniques
