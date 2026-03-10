@@ -61,6 +61,13 @@ let touchDragState = {
   fromIndex: null,
 };
 
+function translateWithVars(key, vars = {}) {
+  return Object.entries(vars).reduce(
+    (message, [name, value]) => message.replace(`{${name}}`, value),
+    t(key),
+  );
+}
+
 // Get touch Y position
 function getTouchY(e) {
   return e.touches ? e.touches[0].clientY : e.clientY;
@@ -262,17 +269,17 @@ function renderCategories() {
 
     categoryEl.innerHTML = `
       <div class="category-header">
-        <span class="drag-handle" title="拖拽排序">⋮⋮</span>
+        <span class="drag-handle" title="${t("drag_to_sort")}">⋮⋮</span>
         <input type="text" class="category-name-input" value="${escapeHtml(category.name)}" 
-               data-cat-index="${catIndex}" placeholder="分类名称">
+               data-cat-index="${catIndex}" placeholder="${t("category_name_placeholder")}">
         ${deleteButtonHtml}
       </div>
       <div class="category-bookmarks" data-cat-index="${catIndex}">
         ${renderBookmarkItems(category.bookmarks, catIndex)}
         <div class="add-bookmark-inline">
-          <input type="text" class="name-input" placeholder="名称" data-cat-index="${catIndex}">
-          <input type="url" class="url-input" placeholder="https://..." data-cat-index="${catIndex}">
-          <button type="button" class="add-btn" data-cat-index="${catIndex}">+</button>
+          <input type="text" class="name-input" placeholder="${t("bookmark_name_placeholder")}" data-cat-index="${catIndex}">
+          <input type="url" class="url-input" placeholder="${t("bookmark_url_placeholder")}" data-cat-index="${catIndex}">
+          <button type="button" class="add-btn" data-cat-index="${catIndex}" title="${t("add_bookmark")}">+</button>
         </div>
       </div>
     `;
@@ -296,7 +303,7 @@ function renderCategories() {
 // Render bookmark items for a category
 function renderBookmarkItems(bookmarks, catIndex) {
   if (bookmarks.length === 0) {
-    return '<div class="bookmarks-empty">暂无书签</div>';
+    return `<div class="bookmarks-empty">${t("no_bookmarks")}</div>`;
   }
 
   return bookmarks
@@ -306,7 +313,7 @@ function renderBookmarkItems(bookmarks, catIndex) {
       <img class="favicon" src="${getFaviconUrl(bookmark.url)}" alt="" onerror="this.style.display='none'">
       <span class="bookmark-name">${escapeHtml(bookmark.name)}</span>
       <span class="bookmark-url">${escapeHtml(bookmark.url)}</span>
-      <button type="button" class="delete-btn" data-cat-index="${catIndex}" data-bookmark-index="${bookmarkIndex}" title="删除">×</button>
+      <button type="button" class="delete-btn" data-cat-index="${catIndex}" data-bookmark-index="${bookmarkIndex}" title="${t("delete_item")}">×</button>
     </div>
   `,
     )
@@ -377,13 +384,13 @@ function addBookmarkToCategory(catIndex) {
   let url = urlInput.value.trim();
 
   if (!name) {
-    showToast("请输入书签名称", "warning");
+    showToast(t("enter_bookmark_name"), "warning");
     nameInput.focus();
     return;
   }
 
   if (!url) {
-    showToast("请输入书签网址", "warning");
+    showToast(t("enter_bookmark_url"), "warning");
     urlInput.focus();
     return;
   }
@@ -396,7 +403,7 @@ function addBookmarkToCategory(catIndex) {
   try {
     new URL(url);
   } catch {
-    showToast("请输入有效的网址", "warning");
+    showToast(t("enter_valid_url"), "warning");
     urlInput.focus();
     return;
   }
@@ -405,7 +412,12 @@ function addBookmarkToCategory(catIndex) {
   for (const category of bookmarkCategories) {
     const existingBookmark = category.bookmarks.find((b) => b.url === url);
     if (existingBookmark) {
-      showToast(`该网址已存在于"${category.name}"分类中`, "warning");
+      showToast(
+        translateWithVars("bookmark_exists_in_category", {
+          category: category.name,
+        }),
+        "warning",
+      );
       urlInput.focus();
       urlInput.select();
       return;
@@ -470,13 +482,14 @@ function renderDockManager() {
   // Render Active Dock Sites
   activeDockContainer.innerHTML = "";
   if (currentDockSites.length === 0) {
-    activeDockContainer.innerHTML =
-      '<div class="bookmarks-empty">暂无站点</div>';
+    activeDockContainer.innerHTML = `<div class="bookmarks-empty">${t("no_sites")}</div>`;
   } else {
     currentDockSites.forEach((site, index) => {
       const el = document.createElement("div");
       el.className = "dock-site-item";
-      el.title = `拖拽排序 | 点击移除 ${site.name}`;
+      el.title = translateWithVars("drag_to_sort_remove_site", {
+        name: site.name,
+      });
       // Use img tag for icon file reference, or fallback to inline SVG for legacy data
       if (site.icon) {
         const img = document.createElement("img");
@@ -531,13 +544,12 @@ function renderDockManager() {
   );
 
   if (availablePresets.length === 0) {
-    presetDockContainer.innerHTML =
-      '<div class="bookmarks-empty">所有预设已添加</div>';
+    presetDockContainer.innerHTML = `<div class="bookmarks-empty">${t("all_presets_added")}</div>`;
   } else {
     availablePresets.forEach((preset) => {
       const el = document.createElement("div");
       el.className = "dock-site-item";
-      el.title = `添加 ${preset.name}`;
+      el.title = translateWithVars("add_site", { name: preset.name });
       // Use img tag for icon file reference, or fallback to inline SVG for legacy data
       if (preset.icon) {
         const img = document.createElement("img");
@@ -630,13 +642,16 @@ async function loadSettings() {
 
     // Load bookmark categories
     bookmarkCategories =
-      result.bookmarkCategories ||
-      JSON.parse(JSON.stringify(defaultBookmarkCategories));
+      Array.isArray(result.bookmarkCategories)
+        ? JSON.parse(JSON.stringify(result.bookmarkCategories))
+        : JSON.parse(JSON.stringify(defaultBookmarkCategories));
     renderCategories();
 
     // Load dock sites
     currentDockSites =
-      result.dockSites || JSON.parse(JSON.stringify(defaultDockSites));
+      Array.isArray(result.dockSites)
+        ? JSON.parse(JSON.stringify(result.dockSites))
+        : JSON.parse(JSON.stringify(defaultDockSites));
     renderDockManager();
   } catch (error) {
     console.error("Failed to load settings:", error);
@@ -649,6 +664,13 @@ async function loadSettings() {
     updateBorderRadiusDisplay(defaultSettings.searchBorderRadius);
     bookmarksFontWeightSelect.value = defaultSettings.bookmarksFontWeight;
     linkTargetSelect.value = defaultSettings.linkTarget;
+    showDockLabelsCheckbox.checked = defaultSettings.showDockLabels;
+    languageSelect.value = defaultSettings.language;
+    saveSearchHistoryCheckbox.checked = defaultSettings.saveSearchHistory;
+    maxSearchHistorySelect.value = defaultSettings.maxSearchHistory;
+    updateSearchHistoryVisibility(defaultSettings.saveSearchHistory);
+    initI18n(defaultSettings.language);
+    applyOptionsTheme();
     bookmarkCategories = JSON.parse(JSON.stringify(defaultBookmarkCategories));
     renderCategories();
     currentDockSites = JSON.parse(JSON.stringify(defaultDockSites));
@@ -683,13 +705,13 @@ async function saveSettings(e) {
     showToast(t("settings_saved"), "success");
   } catch (error) {
     console.error("Failed to save settings:", error);
-    showToast("保存设置失败，请重试。", "error");
+    showToast(t("save_failed"), "error");
   }
 }
 
 // Reset to default settings
 async function resetSettings() {
-  if (confirm("确定要恢复默认设置吗？这将重置所有设置和书签。")) {
+  if (confirm(t("reset_settings_confirm"))) {
     try {
       const resetData = {
         ...defaultSettings,
@@ -708,6 +730,8 @@ async function resetSettings() {
       updateColorDisplay(defaultSettings.lightBgColor);
       updateBorderRadiusDisplay(defaultSettings.searchBorderRadius);
       bookmarksFontWeightSelect.value = defaultSettings.bookmarksFontWeight;
+      linkTargetSelect.value = defaultSettings.linkTarget;
+      showDockLabelsCheckbox.checked = defaultSettings.showDockLabels;
       languageSelect.value = defaultSettings.language;
       setLanguage(defaultSettings.language);
       applyOptionsTheme();
@@ -724,7 +748,7 @@ async function resetSettings() {
       showToast(t("settings_reset"), "success");
     } catch (error) {
       console.error("Failed to reset settings:", error);
-      showToast("重置设置失败，请重试。", "error");
+      showToast(t("reset_failed"), "error");
     }
   }
 }
@@ -796,6 +820,10 @@ function exportSettings() {
     searchBorderRadius: parseInt(searchBorderRadiusInput.value),
     bookmarksFontWeight: parseInt(bookmarksFontWeightSelect.value),
     linkTarget: linkTargetSelect.value,
+    showDockLabels: showDockLabelsCheckbox.checked,
+    language: languageSelect.value,
+    saveSearchHistory: saveSearchHistoryCheckbox.checked,
+    maxSearchHistory: parseInt(maxSearchHistorySelect.value),
     bookmarkCategories: bookmarkCategories,
     dockSites: currentDockSites,
   };
@@ -806,10 +834,10 @@ function exportSettings() {
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
   a.href = url;
-  a.download = `traichu-settings-${new Date().toISOString().slice(0, 10)}.json`;
+  a.download = `traiex-settings-${new Date().toISOString().slice(0, 10)}.json`;
   a.click();
   URL.revokeObjectURL(url);
-  showToast("设置已导出", "success");
+  showToast(t("export_success"), "success");
 }
 
 // Import settings from JSON file
@@ -838,19 +866,35 @@ async function importSettings(file) {
     if (settings.bookmarksFontWeight)
       bookmarksFontWeightSelect.value = settings.bookmarksFontWeight;
     if (settings.linkTarget) linkTargetSelect.value = settings.linkTarget;
-    if (settings.bookmarkCategories) {
+    if (settings.showDockLabels !== undefined)
+      showDockLabelsCheckbox.checked = settings.showDockLabels;
+    if (settings.language) {
+      languageSelect.value = settings.language;
+      setLanguage(settings.language);
+    }
+    if (settings.saveSearchHistory !== undefined) {
+      saveSearchHistoryCheckbox.checked = settings.saveSearchHistory;
+      updateSearchHistoryVisibility(settings.saveSearchHistory);
+    }
+    if (settings.maxSearchHistory !== undefined) {
+      maxSearchHistorySelect.value = settings.maxSearchHistory;
+    }
+    if (Array.isArray(settings.bookmarkCategories)) {
       bookmarkCategories = settings.bookmarkCategories;
       renderCategories();
     }
-    if (settings.dockSites) {
+    if (Array.isArray(settings.dockSites)) {
       currentDockSites = settings.dockSites;
       renderDockManager();
     }
+    renderCategories();
+    renderDockManager();
+    applyOptionsTheme();
 
-    showToast("设置已导入，请点击保存以应用", "success");
+    showToast(t("import_pending_apply"), "success");
   } catch (error) {
     console.error("Import failed:", error);
-    showToast("导入失败：文件格式无效", "error");
+    showToast(t("import_error"), "error");
   }
 }
 
@@ -874,13 +918,13 @@ function updateSearchHistoryVisibility(isEnabled) {
 
 // Clear search history from local storage
 async function clearSearchHistory() {
-  if (confirm(t("delete_confirm") || "确定要清除搜索历史吗？")) {
+  if (confirm(t("clear_search_history_confirm"))) {
     try {
       await chrome.storage.local.remove("searchHistory");
       showToast(t("search_history_cleared"), "success");
     } catch (error) {
       console.error("Failed to clear search history:", error);
-      showToast("清除失败，请重试。", "error");
+      showToast(t("clear_failed"), "error");
     }
   }
 }
@@ -890,6 +934,8 @@ function setupLivePreview() {
   // Language selector needs special handling for instant UI update
   languageSelect.addEventListener("change", () => {
     setLanguage(languageSelect.value);
+    renderCategories();
+    renderDockManager();
   });
 
   // Theme selector needs special handling for instant preview

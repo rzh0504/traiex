@@ -17,6 +17,10 @@ const searchEngines = {
 // Current settings (loaded from storage)
 let currentSettings = { ...defaultSettings };
 let bookmarkCategories = null;
+let dateTimeTimerId = null;
+let currentDateLocale = "";
+let timeFormatter = null;
+let dateFormatter = null;
 
 // Load settings from chrome.storage.sync
 async function loadSettings() {
@@ -37,6 +41,8 @@ async function loadSettings() {
 
 // Apply settings to the page
 function applySettings(settings) {
+  document.documentElement.lang = settings.language || "zh-CN";
+
   // Apply visibility settings
   const dateTimeSection = document.getElementById("date-time");
   const dockSection = document.getElementById("dock");
@@ -60,6 +66,7 @@ function applySettings(settings) {
   if (searchForm) {
     const engine = searchEngines[settings.searchEngine] || searchEngines.google;
     searchForm.action = engine.url;
+    searchForm.target = settings.linkTarget || "_blank";
 
     // Update input name attribute for the correct parameter
     if (searchInput) {
@@ -84,6 +91,12 @@ function applySettings(settings) {
 
   // Apply theme
   applyTheme(settings.theme, settings.lightBgColor);
+
+  if (settings.showDateTime) {
+    renderDateTime(true);
+  } else {
+    stopDateTime();
+  }
 }
 
 // Apply theme mode
@@ -98,6 +111,7 @@ function applyTheme(theme, lightBgColor) {
     applyLightBgColor(lightBgColor);
   } else if (theme === "dark") {
     root.classList.add("theme-dark");
+    root.style.removeProperty("--primary-background-color");
   } else {
     // Auto mode - apply light bg color if system is in light mode
     if (
@@ -105,6 +119,8 @@ function applyTheme(theme, lightBgColor) {
       window.matchMedia("(prefers-color-scheme: light)").matches
     ) {
       applyLightBgColor(lightBgColor);
+    } else {
+      root.style.removeProperty("--primary-background-color");
     }
   }
 }
@@ -124,7 +140,6 @@ function applyLightBgColor(color) {
 // Time/Date formatting functions
 function getTimeOptions() {
   return {
-    timeZone: "Asia/Shanghai",
     hour12: false,
     hour: "2-digit",
     minute: "2-digit",
@@ -133,7 +148,6 @@ function getTimeOptions() {
 
 function getDateOptions() {
   return {
-    timeZone: "Asia/Shanghai",
     year: "numeric",
     month: "long",
     day: "numeric",
@@ -143,14 +157,25 @@ function getDateOptions() {
 
 let lastTimeString = "";
 
-function dateTime() {
+function updateDateTimeFormatters(locale) {
+  if (currentDateLocale === locale && timeFormatter && dateFormatter) {
+    return;
+  }
+
+  currentDateLocale = locale;
+  timeFormatter = new Intl.DateTimeFormat(locale, getTimeOptions());
+  dateFormatter = new Intl.DateTimeFormat(locale, getDateOptions());
+}
+
+function renderDateTime(force = false) {
   const date = new Date();
   const locale = currentSettings.language || "zh-CN";
-  const timeString = date.toLocaleTimeString(locale, getTimeOptions());
-  const dateString = date.toLocaleDateString(locale, getDateOptions());
+  updateDateTimeFormatters(locale);
+  const timeString = timeFormatter.format(date);
+  const dateString = dateFormatter.format(date);
 
   // Only update DOM when values change (performance optimization)
-  if (timeString !== lastTimeString) {
+  if (force || timeString !== lastTimeString) {
     const timeEl = document.getElementById("time");
     const dateEl = document.getElementById("date");
 
@@ -164,12 +189,29 @@ function dateTime() {
     document.getElementById("date").textContent = dateString;
     lastTimeString = timeString;
   }
+}
 
+function scheduleDateTimeTick() {
   // Calculate delay until next minute for efficiency (instead of checking every second)
   const now = new Date();
   const msUntilNextMinute =
     (60 - now.getSeconds()) * 1000 - now.getMilliseconds() + 50; // +50ms buffer
-  setTimeout(dateTime, msUntilNextMinute);
+  clearTimeout(dateTimeTimerId);
+  dateTimeTimerId = setTimeout(() => {
+    renderDateTime();
+    scheduleDateTimeTick();
+  }, msUntilNextMinute);
+}
+
+function startDateTime() {
+  renderDateTime(true);
+  scheduleDateTimeTick();
+}
+
+function stopDateTime() {
+  clearTimeout(dateTimeTimerId);
+  dateTimeTimerId = null;
+  lastTimeString = "";
 }
 
 // Render Dock Sites
@@ -185,7 +227,7 @@ function renderDock() {
 
   // Use docked sites from settings, fallback to global dockSites (from data.js) if available
   const sites =
-    currentSettings.dockSites && currentSettings.dockSites.length > 0
+    Array.isArray(currentSettings.dockSites)
       ? currentSettings.dockSites
       : typeof dockSites !== "undefined"
         ? dockSites
@@ -212,6 +254,9 @@ function renderDock() {
     a.setAttribute("aria-label", site.name);
     a.setAttribute("title", site.name);
     a.target = currentSettings.linkTarget || "_blank";
+    if (a.target === "_blank") {
+      a.rel = "noopener noreferrer";
+    }
 
     // Add label if enabled
     if (currentSettings.showDockLabels) {
@@ -245,7 +290,7 @@ function setupDockDragReorder(dockContainer) {
 
   // --- Helper: get current sites array ---
   function getCurrentSites() {
-    return currentSettings.dockSites && currentSettings.dockSites.length > 0
+    return Array.isArray(currentSettings.dockSites)
       ? currentSettings.dockSites
       : typeof dockSites !== "undefined"
         ? [...dockSites]
@@ -569,6 +614,9 @@ function renderBookmarks() {
       const a = document.createElement("a");
       a.href = bookmark.url;
       a.target = currentSettings.linkTarget || "_blank";
+      if (a.target === "_blank") {
+        a.rel = "noopener noreferrer";
+      }
 
       const img = document.createElement("img");
       img.src = getFaviconUrl(bookmark.url);
@@ -1150,10 +1198,10 @@ async function showSearchHistory(searchInput, dropdown) {
       e.preventDefault();
       const query = history[index];
       saveSearchToHistory(query);
-      const form = searchInput.form;
-      const engine = form.action;
-      const param = searchInput.name;
-      window.location.href = `${engine}?${param}=${encodeURIComponent(query)}`;
+      navigateToUrl(
+        buildSearchUrl(searchInput.form, searchInput, query),
+        currentSettings.linkTarget,
+      );
     });
   });
 }
@@ -1209,14 +1257,14 @@ async function showSearchSuggestions(searchInput, dropdown, query) {
 
       if (match.type === "bookmark" && match.url) {
         // Navigate directly to bookmark URL
-        window.open(match.url, currentSettings.linkTarget || "_blank");
+        navigateToUrl(match.url, currentSettings.linkTarget);
       } else {
         // Search for the history item
         saveSearchToHistory(match.text);
-        const form = searchInput.form;
-        const engine = form.action;
-        const param = searchInput.name;
-        window.location.href = `${engine}?${param}=${encodeURIComponent(match.text)}`;
+        navigateToUrl(
+          buildSearchUrl(searchInput.form, searchInput, match.text),
+          currentSettings.linkTarget,
+        );
       }
     });
   });
@@ -1228,6 +1276,21 @@ function hideSuggestions(dropdown) {
     // Reset selected index when hiding
     dropdown.dataset.selectedIndex = "-1";
   }
+}
+
+function navigateToUrl(url, target = currentSettings.linkTarget || "_blank") {
+  if (target === "_self") {
+    window.location.assign(url);
+    return;
+  }
+
+  window.open(url, target, "noopener");
+}
+
+function buildSearchUrl(searchForm, searchInput, query) {
+  const url = new URL(searchForm.action);
+  url.searchParams.set(searchInput.name, query);
+  return url.toString();
 }
 
 // Keyboard navigation for dropdown
@@ -1380,7 +1443,7 @@ async function traichu() {
 
   // Render content
   if (settings.showDateTime) {
-    dateTime();
+    startDateTime();
   }
   renderDock();
   renderBookmarks();
@@ -1414,20 +1477,23 @@ chrome.storage.onChanged.addListener((changes, namespace) => {
 
       applySettings(settings);
 
-      // Special handling for dateTime - need to restart if turned on
-      if (
-        changes.showDateTime &&
-        changes.showDateTime.newValue &&
-        !changes.showDateTime.oldValue
-      ) {
-        dateTime();
+      if (changes.language && settings.showDateTime) {
+        renderDateTime(true);
+      }
+
+      if (changes.showDateTime) {
+        if (changes.showDateTime.newValue) {
+          startDateTime();
+        } else {
+          stopDateTime();
+        }
       }
     });
   }
 });
 
 // Event Listeners
-window.addEventListener("load", () => {
+window.addEventListener("DOMContentLoaded", () => {
   traichu();
   setupKeyboardShortcuts();
 });

@@ -1,9 +1,5 @@
 /* Options Page Styles - Matching Homepage Design */
 
-/* Import shared variables */
-@import url("vars.css");
-@import url("reset.css");
-
 * {
   margin: 0;
   padding: 0;

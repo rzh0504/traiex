@@ -7,6 +7,7 @@ const translations = {
     'zh-CN': {
         // Page title
         page_title: 'traiex 设置',
+        settings_subtitle: '设置',
         
         // Section headers
         display: '显示',
@@ -73,9 +74,7 @@ const translations = {
         // Toast messages
         settings_saved: '设置已保存',
         settings_reset: '已恢复默认设置',
-        export_success: '设置导出成功',
         import_success: '设置导入成功',
-        import_error: '导入失败：无效的设置文件',
         
         // Bookmark management
         add_category: '添加分类',
@@ -89,6 +88,27 @@ const translations = {
         category_limit_min: '至少需要2个分类',
         category_limit_max: '最多只能有4个分类',
         new_category: '新分类',
+        no_bookmarks: '暂无书签',
+        no_sites: '暂无站点',
+        category_name_placeholder: '分类名称',
+        bookmark_name_placeholder: '名称',
+        bookmark_url_placeholder: 'https://...',
+        delete_item: '删除',
+        drag_to_sort: '拖拽排序',
+        drag_to_sort_remove_site: '拖拽排序 | 点击移除 {name}',
+        add_site: '添加 {name}',
+        enter_bookmark_name: '请输入书签名称',
+        enter_bookmark_url: '请输入书签网址',
+        enter_valid_url: '请输入有效的网址',
+        bookmark_exists_in_category: '该网址已存在于"{category}"分类中',
+        reset_settings_confirm: '确定要恢复默认设置吗？这将重置所有设置和书签。',
+        save_failed: '保存设置失败，请重试。',
+        reset_failed: '重置设置失败，请重试。',
+        clear_failed: '清除失败，请重试。',
+        export_success: '设置已导出',
+        import_pending_apply: '设置已导入，请点击保存以应用',
+        import_error: '导入失败：文件格式无效',
+        clear_search_history_confirm: '确定要清除搜索历史吗？',
         
         // Color presets
         color_lavender: '淡紫蓝 (默认)',
@@ -121,6 +141,7 @@ const translations = {
     'en': {
         // Page title
         page_title: 'traiex Settings',
+        settings_subtitle: 'settings',
         
         // Section headers
         display: 'Display',
@@ -187,9 +208,7 @@ const translations = {
         // Toast messages
         settings_saved: 'Settings saved',
         settings_reset: 'Settings reset to defaults',
-        export_success: 'Settings exported successfully',
         import_success: 'Settings imported successfully',
-        import_error: 'Import failed: Invalid settings file',
         
         // Bookmark management
         add_category: 'Add Category',
@@ -203,6 +222,27 @@ const translations = {
         category_limit_min: 'Minimum 2 categories required',
         category_limit_max: 'Maximum 4 categories allowed',
         new_category: 'New Category',
+        no_bookmarks: 'No bookmarks yet',
+        no_sites: 'No sites yet',
+        category_name_placeholder: 'Category name',
+        bookmark_name_placeholder: 'Name',
+        bookmark_url_placeholder: 'https://...',
+        delete_item: 'Delete',
+        drag_to_sort: 'Drag to reorder',
+        drag_to_sort_remove_site: 'Drag to reorder | Click to remove {name}',
+        add_site: 'Add {name}',
+        enter_bookmark_name: 'Please enter a bookmark name',
+        enter_bookmark_url: 'Please enter a bookmark URL',
+        enter_valid_url: 'Please enter a valid URL',
+        bookmark_exists_in_category: 'This URL already exists in "{category}"',
+        reset_settings_confirm: 'Reset all settings and bookmarks to defaults?',
+        save_failed: 'Failed to save settings. Please try again.',
+        reset_failed: 'Failed to reset settings. Please try again.',
+        clear_failed: 'Failed to clear history. Please try again.',
+        export_success: 'Settings exported',
+        import_pending_apply: 'Settings imported. Click save to apply them.',
+        import_error: 'Import failed: Invalid settings file',
+        clear_search_history_confirm: 'Clear all saved search history?',
         
         // Color presets
         color_lavender: 'Lavender (Default)',
