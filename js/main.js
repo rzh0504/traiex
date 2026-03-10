@@ -190,16 +190,17 @@ function renderDock() {
         ? dockSites
         : [];
 
-  sites.forEach((site) => {
+  sites.forEach((site, index) => {
     const li = document.createElement("li");
+    li.dataset.index = index;
     const a = document.createElement("a");
     a.href = site.url;
     // Use img tag for icon file reference, or fallback to inline SVG for legacy data
     if (site.icon) {
-      const img = document.createElement('img');
+      const img = document.createElement("img");
       img.src = site.icon;
       img.alt = site.name;
-      img.className = 'dock-icon';
+      img.className = "dock-icon";
       a.appendChild(img);
     } else if (site.svg) {
       // Legacy SVG support
@@ -228,6 +229,304 @@ function renderDock() {
 
   dockContainer.innerHTML = "";
   dockContainer.appendChild(ul);
+
+  // Setup long-press drag reorder
+  setupDockDragReorder(dockContainer);
+}
+
+// Dock long-press drag reorder
+function setupDockDragReorder(dockContainer) {
+  const LONG_PRESS_DURATION = 500; // ms
+  let longPressTimer = null;
+  let isEditMode = false;
+  let dragSrcEl = null;
+  let touchDragEl = null; // ghost element for touch drag
+  let touchCurrentTarget = null;
+
+  // --- Helper: get current sites array ---
+  function getCurrentSites() {
+    return currentSettings.dockSites && currentSettings.dockSites.length > 0
+      ? currentSettings.dockSites
+      : typeof dockSites !== "undefined"
+        ? [...dockSites]
+        : [];
+  }
+
+  // --- Helper: save new order ---
+  function saveNewOrder() {
+    const ul = dockContainer.querySelector("ul");
+    if (!ul) return;
+    const items = ul.querySelectorAll("li");
+    const sites = getCurrentSites();
+    const newSites = [];
+    items.forEach((li) => {
+      const idx = parseInt(li.dataset.index);
+      if (sites[idx]) {
+        newSites.push(sites[idx]);
+      }
+    });
+    // Update data-index to reflect new order
+    items.forEach((li, i) => {
+      li.dataset.index = i;
+    });
+    currentSettings.dockSites = newSites;
+    chrome.storage.sync.set({ dockSites: newSites });
+  }
+
+  // --- Helper: clear all drag-over classes ---
+  function clearDragOverClasses() {
+    dockContainer.querySelectorAll("li").forEach((li) => {
+      li.classList.remove("drag-over-left", "drag-over-right");
+    });
+  }
+
+  // --- Enter/Exit edit mode ---
+  function enterEditMode() {
+    if (isEditMode) return;
+    isEditMode = true;
+    dockContainer.classList.add("dock-edit-mode");
+
+    const items = dockContainer.querySelectorAll("li");
+    items.forEach((li) => {
+      li.setAttribute("draggable", "true");
+    });
+
+    // Click anywhere outside dock to exit
+    setTimeout(() => {
+      document.addEventListener("click", exitOnOutsideClick);
+      document.addEventListener("keydown", exitOnEscape);
+    }, 10);
+  }
+
+  function exitEditMode() {
+    if (!isEditMode) return;
+    isEditMode = false;
+    dockContainer.classList.remove("dock-edit-mode");
+    clearDragOverClasses();
+
+    const items = dockContainer.querySelectorAll("li");
+    items.forEach((li) => {
+      li.removeAttribute("draggable");
+      li.classList.remove("dragging");
+    });
+
+    document.removeEventListener("click", exitOnOutsideClick);
+    document.removeEventListener("keydown", exitOnEscape);
+  }
+
+  function exitOnOutsideClick(e) {
+    if (!dockContainer.contains(e.target)) {
+      exitEditMode();
+    }
+  }
+
+  function exitOnEscape(e) {
+    if (e.key === "Escape") {
+      exitEditMode();
+    }
+  }
+
+  // --- Long press detection ---
+  function cancelLongPress() {
+    if (longPressTimer) {
+      clearTimeout(longPressTimer);
+      longPressTimer = null;
+    }
+  }
+
+  dockContainer.addEventListener("pointerdown", (e) => {
+    const li = e.target.closest("#dock li");
+    if (!li) return;
+
+    cancelLongPress();
+    longPressTimer = setTimeout(() => {
+      longPressTimer = null;
+      enterEditMode();
+      // Prevent the upcoming click from navigating
+      li.querySelector("a")?.addEventListener("click", preventClick, {
+        once: true,
+      });
+    }, LONG_PRESS_DURATION);
+  });
+
+  dockContainer.addEventListener("pointerup", cancelLongPress);
+  dockContainer.addEventListener("pointerleave", cancelLongPress);
+  dockContainer.addEventListener("pointermove", (e) => {
+    // Cancel long press if pointer moves too much (allow small jitter)
+    if (
+      longPressTimer &&
+      (Math.abs(e.movementX) > 3 || Math.abs(e.movementY) > 3)
+    ) {
+      cancelLongPress();
+    }
+  });
+
+  function preventClick(e) {
+    e.preventDefault();
+    e.stopPropagation();
+  }
+
+  // --- HTML5 Drag & Drop (desktop) ---
+  dockContainer.addEventListener("dragstart", (e) => {
+    if (!isEditMode) {
+      e.preventDefault();
+      return;
+    }
+    const li = e.target.closest("#dock li");
+    if (!li) return;
+    dragSrcEl = li;
+    li.classList.add("dragging");
+    e.dataTransfer.effectAllowed = "move";
+    e.dataTransfer.setData("text/plain", li.dataset.index);
+  });
+
+  dockContainer.addEventListener("dragover", (e) => {
+    if (!isEditMode || !dragSrcEl) return;
+    e.preventDefault();
+    e.dataTransfer.dropEffect = "move";
+
+    const li = e.target.closest("#dock li");
+    if (!li || li === dragSrcEl) {
+      clearDragOverClasses();
+      return;
+    }
+
+    clearDragOverClasses();
+    // Determine if we're on the left or right half of the target
+    const rect = li.getBoundingClientRect();
+    const midX = rect.left + rect.width / 2;
+    if (e.clientX < midX) {
+      li.classList.add("drag-over-left");
+    } else {
+      li.classList.add("drag-over-right");
+    }
+  });
+
+  dockContainer.addEventListener("drop", (e) => {
+    if (!isEditMode || !dragSrcEl) return;
+    e.preventDefault();
+
+    const li = e.target.closest("#dock li");
+    if (!li || li === dragSrcEl) return;
+
+    const ul = dockContainer.querySelector("ul");
+    // Determine insert position based on cursor side
+    const rect = li.getBoundingClientRect();
+    const midX = rect.left + rect.width / 2;
+    if (e.clientX < midX) {
+      ul.insertBefore(dragSrcEl, li);
+    } else {
+      ul.insertBefore(dragSrcEl, li.nextSibling);
+    }
+
+    saveNewOrder();
+  });
+
+  dockContainer.addEventListener("dragend", () => {
+    if (dragSrcEl) {
+      dragSrcEl.classList.remove("dragging");
+      dragSrcEl = null;
+    }
+    clearDragOverClasses();
+  });
+
+  // --- Touch drag support (mobile) ---
+  dockContainer.addEventListener(
+    "touchmove",
+    (e) => {
+      if (!isEditMode) return;
+      const li = e.target.closest("#dock li");
+      if (!li || !li.classList.contains("dragging")) {
+        // Start touch drag if in edit mode and we haven't started yet
+        if (li && !dragSrcEl) {
+          dragSrcEl = li;
+          li.classList.add("dragging");
+        }
+        if (!dragSrcEl) return;
+      }
+
+      e.preventDefault();
+      const touch = e.touches[0];
+
+      // Create/move ghost element
+      if (!touchDragEl) {
+        touchDragEl = dragSrcEl.cloneNode(true);
+        touchDragEl.style.cssText = `
+        position: fixed; z-index: 9999; pointer-events: none;
+        opacity: 0.8; transform: scale(1.1);
+        left: ${touch.clientX - 30}px; top: ${touch.clientY - 30}px;
+      `;
+        document.body.appendChild(touchDragEl);
+      } else {
+        touchDragEl.style.left = touch.clientX - 30 + "px";
+        touchDragEl.style.top = touch.clientY - 30 + "px";
+      }
+
+      // Find element under touch point
+      if (touchDragEl) touchDragEl.style.display = "none";
+      const elemBelow = document.elementFromPoint(touch.clientX, touch.clientY);
+      if (touchDragEl) touchDragEl.style.display = "";
+
+      const targetLi = elemBelow?.closest("#dock li");
+      clearDragOverClasses();
+      if (targetLi && targetLi !== dragSrcEl) {
+        touchCurrentTarget = targetLi;
+        const rect = targetLi.getBoundingClientRect();
+        const midX = rect.left + rect.width / 2;
+        if (touch.clientX < midX) {
+          targetLi.classList.add("drag-over-left");
+        } else {
+          targetLi.classList.add("drag-over-right");
+        }
+      } else {
+        touchCurrentTarget = null;
+      }
+    },
+    { passive: false },
+  );
+
+  dockContainer.addEventListener("touchend", (e) => {
+    if (!isEditMode || !dragSrcEl) return;
+
+    // Perform the swap if there's a valid target
+    if (touchCurrentTarget && touchCurrentTarget !== dragSrcEl) {
+      const ul = dockContainer.querySelector("ul");
+      const lastTouch = e.changedTouches[0];
+      const rect = touchCurrentTarget.getBoundingClientRect();
+      const midX = rect.left + rect.width / 2;
+      if (lastTouch.clientX < midX) {
+        ul.insertBefore(dragSrcEl, touchCurrentTarget);
+      } else {
+        ul.insertBefore(dragSrcEl, touchCurrentTarget.nextSibling);
+      }
+      saveNewOrder();
+    }
+
+    // Cleanup
+    dragSrcEl.classList.remove("dragging");
+    dragSrcEl = null;
+    touchCurrentTarget = null;
+    clearDragOverClasses();
+    if (touchDragEl) {
+      touchDragEl.remove();
+      touchDragEl = null;
+    }
+  });
+
+  // In edit mode, clicks on links should not navigate
+  dockContainer.addEventListener(
+    "click",
+    (e) => {
+      if (isEditMode) {
+        const a = e.target.closest("#dock a");
+        if (a) {
+          e.preventDefault();
+          e.stopPropagation();
+        }
+      }
+    },
+    true,
+  );
 }
 
 // Render Bookmarks (categorized layout)
