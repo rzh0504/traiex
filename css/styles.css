@@ -567,17 +567,20 @@ aside svg {
   cursor: grab;
   position: relative;
   border-radius: 0.25rem;
-  transition: all 0.2s ease;
+  transition: background-color 0.2s ease, box-shadow 0.2s ease;
+  animation: bookmark-wiggle 0.3s ease-in-out infinite alternate;
+}
+
+#bookmarks.bookmark-edit-mode li:not(.category-header-item):nth-child(odd) {
+  animation-delay: 0.15s;
 }
 
 #bookmarks.bookmark-edit-mode li:not(.category-header-item):hover {
   background-color: hsl(var(--color-theme-accent-hsl) / 0.1);
-  transform: translateX(4px);
 }
 
 #bookmarks.bookmark-edit-mode li:not(.category-header-item):active {
   background-color: hsl(var(--color-theme-accent-hsl) / 0.2);
-  transform: scale(0.98);
 }
 
 #bookmarks li.bm-dragging {
@@ -613,7 +616,10 @@ aside svg {
   box-shadow: 0 0 6px var(--color-theme-accent, #4a90d9);
 }
 
-
+@keyframes bookmark-wiggle {
+  0% { transform: rotate(-0.8deg); }
+  100% { transform: rotate(0.8deg); }
+}
 
 /*
     Accessible hiding for screen readers
@@ -658,12 +664,7 @@ aside svg {
     justify-content: space-between;
   }
 
-  /* Center bookmarks when there are 2-3 columns */
-  #bookmarks[data-columns="2"],
-  #bookmarks[data-columns="3"] {
-    justify-content: center;
-    gap: var(--spacing-l);
-  }
+
 }
 
 /* Forced Theme Overrides */
