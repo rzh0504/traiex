@@ -325,25 +325,31 @@ select:focus {
 }
 
 .save-btn {
-  flex: 1;
+  position: fixed;
+  bottom: 1.5rem;
+  right: 1.5rem;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: var(--spacing-s);
-  padding: var(--spacing-m);
+  padding: var(--spacing-m) var(--spacing-l);
   background-color: var(--primary-font-color);
   color: var(--primary-background-color);
   border: none;
-  border-radius: 0.25rem;
+  border-radius: 0.5rem;
   font-family: var(--font-monospace);
   font-size: 0.9rem;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s ease;
+  z-index: 1000;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
 
 .save-btn:hover {
-  opacity: 0.85;
+  opacity: 0.9;
+  transform: scale(1.05);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
 }
 
 .save-btn .btn-icon {

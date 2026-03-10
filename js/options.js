@@ -51,9 +51,6 @@ const clearSearchHistorySection = document.getElementById(
 );
 const clearSearchHistoryBtn = document.getElementById("clearSearchHistoryBtn");
 
-// Auto-save debounce timer
-let autoSaveTimeout = null;
-
 // Touch drag state for mobile support
 let touchDragState = {
   isDragging: false,
@@ -869,38 +866,6 @@ function setupImportExport() {
   });
 }
 
-// Auto-save function with debounce
-function triggerAutoSave() {
-  if (autoSaveTimeout) {
-    clearTimeout(autoSaveTimeout);
-  }
-  autoSaveTimeout = setTimeout(async () => {
-    const settings = {
-      showDateTime: showDateTimeCheckbox.checked,
-      showDock: showDockCheckbox.checked,
-      showBookmarks: showBookmarksCheckbox.checked,
-      searchEngine: searchEngineSelect.value,
-      theme: themeSelect.value,
-      lightBgColor: lightBgColorInput.value,
-      searchBorderRadius: parseInt(searchBorderRadiusInput.value),
-      bookmarksFontWeight: parseInt(bookmarksFontWeightSelect.value),
-      linkTarget: linkTargetSelect.value,
-      showDockLabels: showDockLabelsCheckbox.checked,
-      language: languageSelect.value,
-      saveSearchHistory: saveSearchHistoryCheckbox.checked,
-      maxSearchHistory: parseInt(maxSearchHistorySelect.value),
-      bookmarkCategories: bookmarkCategories,
-      dockSites: currentDockSites,
-    };
-    try {
-      await chrome.storage.sync.set(settings);
-      showToast(t("settings_saved"), "success");
-    } catch (error) {
-      console.error("Auto-save failed:", error);
-    }
-  }, 1000); // 1 second debounce
-}
-
 // Update search history related section visibility
 function updateSearchHistoryVisibility(isEnabled) {
   maxSearchHistorySection.style.display = isEnabled ? "" : "none";
@@ -920,26 +885,8 @@ async function clearSearchHistory() {
   }
 }
 
-// Setup auto-save listeners
-function setupAutoSave() {
-  // Add change listeners to all form elements
-  const autoSaveElements = [
-    showDateTimeCheckbox,
-    showDockCheckbox,
-    showBookmarksCheckbox,
-    searchEngineSelect,
-    themeSelect,
-    linkTargetSelect,
-    bookmarksFontWeightSelect,
-    showDockLabelsCheckbox,
-    languageSelect,
-    saveSearchHistoryCheckbox,
-    maxSearchHistorySelect,
-  ];
-  autoSaveElements.forEach((el) => {
-    el.addEventListener("change", triggerAutoSave);
-  });
-
+// Setup live preview listeners (no auto-save, just instant UI feedback)
+function setupLivePreview() {
   // Language selector needs special handling for instant UI update
   languageSelect.addEventListener("change", () => {
     setLanguage(languageSelect.value);
@@ -967,10 +914,6 @@ function setupAutoSave() {
   saveSearchHistoryCheckbox.addEventListener("change", () => {
     updateSearchHistoryVisibility(saveSearchHistoryCheckbox.checked);
   });
-
-  // Range and color inputs use input event
-  searchBorderRadiusInput.addEventListener("change", triggerAutoSave);
-  lightBgColorInput.addEventListener("change", triggerAutoSave);
 }
 
 // Event listeners
@@ -984,7 +927,7 @@ document.addEventListener("DOMContentLoaded", () => {
   setupColorInput();
   setupBorderRadiusInput();
   setupImportExport();
-  setupAutoSave();
+  setupLivePreview();
 
   // Clear search history button
   clearSearchHistoryBtn.addEventListener("click", clearSearchHistory);
