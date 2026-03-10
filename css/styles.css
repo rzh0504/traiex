@@ -1,8 +1,15 @@
+html {
+  background-color: var(--primary-background-color);
+  min-height: 100%;
+}
+
 body {
   background-color: var(--primary-background-color);
   color: var(--primary-font-color);
   font-family: var(--font-monospace);
   font-size: var(--font-size-body);
+  min-height: 100vh;
+  min-height: 100dvh;
   opacity: 0;
   transition: opacity 0.3s ease-out;
 }
@@ -11,12 +18,18 @@ body.loaded {
   opacity: 1;
 }
 
+body.navigating #traichu,
+body.navigating .settings-btn {
+  visibility: hidden;
+}
+
 main {
   align-items: center;
   display: flex;
   flex-direction: column;
   justify-content: center;
   min-height: 100vh;
+  min-height: 100dvh;
 }
 
 #traichu {

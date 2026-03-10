@@ -21,6 +21,7 @@ let dateTimeTimerId = null;
 let currentDateLocale = "";
 let timeFormatter = null;
 let dateFormatter = null;
+let isNavigatingAway = false;
 
 // Load settings from chrome.storage.sync
 async function loadSettings() {
@@ -214,6 +215,41 @@ function stopDateTime() {
   lastTimeString = "";
 }
 
+function shouldHandleSameTabNavigation(event) {
+  return (
+    currentSettings.linkTarget === "_self" &&
+    event.button === 0 &&
+    !event.metaKey &&
+    !event.ctrlKey &&
+    !event.shiftKey &&
+    !event.altKey
+  );
+}
+
+function preparePageForNavigation() {
+  if (isNavigatingAway) return;
+  isNavigatingAway = true;
+
+  const resolvedBg = getComputedStyle(document.documentElement)
+    .getPropertyValue("--primary-background-color")
+    .trim();
+  const fallbackBg = getComputedStyle(document.body).backgroundColor;
+  const backgroundColor = resolvedBg || fallbackBg;
+
+  document.documentElement.style.backgroundColor = backgroundColor;
+  document.body.style.backgroundColor = backgroundColor;
+  document.body.style.opacity = "1";
+  document.body.classList.remove("loaded");
+  document.body.classList.add("navigating");
+}
+
+function navigateCurrentTab(url) {
+  preparePageForNavigation();
+  requestAnimationFrame(() => {
+    window.location.assign(url);
+  });
+}
+
 // Render Dock Sites
 function renderDock() {
   const dockContainer = document.getElementById("dock");
@@ -267,7 +303,16 @@ function renderDock() {
     }
 
     // Remove focus/hover state on click to prevent animation when returning to page
-    a.addEventListener("click", function () {
+    a.addEventListener("click", function (event) {
+      if (
+        shouldHandleSameTabNavigation(event) &&
+        !dockContainer.classList.contains("dock-edit-mode")
+      ) {
+        event.preventDefault();
+        navigateCurrentTab(site.url);
+        return;
+      }
+
       this.blur();
     });
 
@@ -632,7 +677,16 @@ function renderBookmarks() {
       a.appendChild(document.createTextNode(bookmark.name));
 
       // Remove focus on click/touch for mobile (CSS :focus-visible handles desktop)
-      a.addEventListener("click", function () {
+      a.addEventListener("click", function (event) {
+        if (
+          shouldHandleSameTabNavigation(event) &&
+          !bookmarksContainer.classList.contains("bookmark-edit-mode")
+        ) {
+          event.preventDefault();
+          navigateCurrentTab(bookmark.url);
+          return;
+        }
+
         this.blur();
       });
 
