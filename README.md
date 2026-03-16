@@ -6,9 +6,11 @@
 
 [中文文档](README_zh.md)
 
+[Privacy Policy](privacy.html)
+
 ## ✨ Features
 
-- **🕐 Time & Date Display** - Clean time display with Beijing timezone (Asia/Shanghai), supporting both Chinese and English formats
+- **🕐 Time & Date Display** - Clean time display using your browser's current timezone, with Chinese and English date formats
 - **🔍 Multi-Search Engine** - Google, Bing, DuckDuckGo, Baidu
 - **🚀 Quick Access Dock** - Drag-and-drop customizable icon dock with preset sites
 - **📚 Categorized Bookmarks** - Organize your bookmarks into categories with drag-and-drop reordering
@@ -36,6 +38,11 @@
 ### Build for Distribution
 
 No build step required! This extension uses vanilla HTML, CSS, and JavaScript.
+
+## Privacy
+
+- A privacy policy source page is included at `privacy.html`
+- Before store submission, host that page at a public URL and use that URL in the store listing
 
 ## ⚙️ Configuration
 

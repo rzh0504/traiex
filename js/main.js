@@ -262,12 +262,11 @@ function renderDock() {
   }
 
   // Use docked sites from settings, fallback to global dockSites (from data.js) if available
-  const sites =
-    Array.isArray(currentSettings.dockSites)
-      ? currentSettings.dockSites
-      : typeof dockSites !== "undefined"
-        ? dockSites
-        : [];
+  const sites = Array.isArray(currentSettings.dockSites)
+    ? currentSettings.dockSites
+    : typeof dockSites !== "undefined"
+      ? dockSites
+      : [];
 
   sites.forEach((site, index) => {
     const li = document.createElement("li");
@@ -332,6 +331,10 @@ function setupDockDragReorder(dockContainer) {
   let dragSrcEl = null;
   let touchDragEl = null; // ghost element for touch drag
   let touchCurrentTarget = null;
+  let pointerDownTarget = null;
+  let pointerDownX = 0;
+  let pointerDownY = 0;
+  let suppressNextClick = false;
 
   // --- Helper: get current sites array ---
   function getCurrentSites() {
@@ -360,7 +363,11 @@ function setupDockDragReorder(dockContainer) {
       li.dataset.index = i;
     });
     currentSettings.dockSites = newSites;
-    chrome.storage.sync.set({ dockSites: newSites });
+    chrome.storage.sync.set({ dockSites: newSites }, () => {
+      if (chrome.runtime.lastError) {
+        console.error("Failed to save dock order:", chrome.runtime.lastError);
+      }
+    });
   }
 
   // --- Helper: clear all drag-over classes ---
@@ -426,12 +433,18 @@ function setupDockDragReorder(dockContainer) {
 
   dockContainer.addEventListener("pointerdown", (e) => {
     const li = e.target.closest("#dock li");
-    if (!li) return;
+    if (!li || (e.pointerType === "mouse" && e.button !== 0)) return;
+
+    pointerDownTarget = li;
+    pointerDownX = e.clientX;
+    pointerDownY = e.clientY;
 
     cancelLongPress();
     longPressTimer = setTimeout(() => {
       longPressTimer = null;
+      if (pointerDownTarget !== li) return;
       enterEditMode();
+      suppressNextClick = true;
       // Prevent the upcoming click from navigating
       li.querySelector("a")?.addEventListener("click", preventClick, {
         once: true,
@@ -439,15 +452,26 @@ function setupDockDragReorder(dockContainer) {
     }, LONG_PRESS_DURATION);
   });
 
-  dockContainer.addEventListener("pointerup", cancelLongPress);
-  dockContainer.addEventListener("pointerleave", cancelLongPress);
+  dockContainer.addEventListener("pointerup", () => {
+    cancelLongPress();
+    pointerDownTarget = null;
+  });
+  dockContainer.addEventListener("pointercancel", () => {
+    cancelLongPress();
+    pointerDownTarget = null;
+  });
+  dockContainer.addEventListener("pointerleave", () => {
+    cancelLongPress();
+    pointerDownTarget = null;
+  });
   dockContainer.addEventListener("pointermove", (e) => {
     // Cancel long press if pointer moves too much (allow small jitter)
-    if (
-      longPressTimer &&
-      (Math.abs(e.movementX) > 3 || Math.abs(e.movementY) > 3)
-    ) {
+    if (!longPressTimer) return;
+    const dx = Math.abs(e.clientX - pointerDownX);
+    const dy = Math.abs(e.clientY - pointerDownY);
+    if (dx > 8 || dy > 8) {
       cancelLongPress();
+      pointerDownTarget = null;
     }
   });
 
@@ -503,13 +527,18 @@ function setupDockDragReorder(dockContainer) {
     // Determine insert position based on cursor side
     const rect = li.getBoundingClientRect();
     const midX = rect.left + rect.width / 2;
+    const originalIndex = Array.from(ul.children).indexOf(dragSrcEl);
+
     if (e.clientX < midX) {
       ul.insertBefore(dragSrcEl, li);
     } else {
       ul.insertBefore(dragSrcEl, li.nextSibling);
     }
 
-    saveNewOrder();
+    const newIndex = Array.from(ul.children).indexOf(dragSrcEl);
+    if (newIndex !== originalIndex) {
+      saveNewOrder();
+    }
   });
 
   dockContainer.addEventListener("dragend", () => {
@@ -607,6 +636,16 @@ function setupDockDragReorder(dockContainer) {
   dockContainer.addEventListener(
     "click",
     (e) => {
+      if (suppressNextClick) {
+        suppressNextClick = false;
+        const a = e.target.closest("#dock a");
+        if (a) {
+          e.preventDefault();
+          e.stopPropagation();
+          return;
+        }
+      }
+
       if (isEditMode) {
         const a = e.target.closest("#dock a");
         if (a) {
