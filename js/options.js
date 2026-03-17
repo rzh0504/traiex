@@ -612,7 +612,7 @@ function removeDockSite(index) {
 // Load settings from storage
 async function loadSettings() {
   try {
-    const result = await chrome.storage.sync.get({
+    const result = await appStorage.sync.get({
       ...defaultSettings,
       bookmarkCategories: null,
     });
@@ -701,7 +701,7 @@ async function saveSettings(e) {
   };
 
   try {
-    await chrome.storage.sync.set(settings);
+    await appStorage.sync.set(settings);
     showToast(t("settings_saved"), "success");
   } catch (error) {
     console.error("Failed to save settings:", error);
@@ -720,7 +720,7 @@ async function resetSettings() {
         ),
         dockSites: JSON.parse(JSON.stringify(defaultDockSites)),
       };
-      await chrome.storage.sync.set(resetData);
+      await appStorage.sync.set(resetData);
 
       showDateTimeCheckbox.checked = defaultSettings.showDateTime;
       showDockCheckbox.checked = defaultSettings.showDock;
@@ -920,7 +920,7 @@ function updateSearchHistoryVisibility(isEnabled) {
 async function clearSearchHistory() {
   if (confirm(t("clear_search_history_confirm"))) {
     try {
-      await chrome.storage.local.remove("searchHistory");
+      await appStorage.local.remove("searchHistory");
       showToast(t("search_history_cleared"), "success");
     } catch (error) {
       console.error("Failed to clear search history:", error);

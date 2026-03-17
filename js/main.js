@@ -23,10 +23,10 @@ let timeFormatter = null;
 let dateFormatter = null;
 let isNavigatingAway = false;
 
-// Load settings from chrome.storage.sync
+// Load settings from storage
 async function loadSettings() {
   try {
-    const result = await chrome.storage.sync.get({
+    const result = await appStorage.sync.get({
       ...defaultSettings,
       bookmarkCategories: null,
       dockSites: null,
@@ -363,10 +363,8 @@ function setupDockDragReorder(dockContainer) {
       li.dataset.index = i;
     });
     currentSettings.dockSites = newSites;
-    chrome.storage.sync.set({ dockSites: newSites }, () => {
-      if (chrome.runtime.lastError) {
-        console.error("Failed to save dock order:", chrome.runtime.lastError);
-      }
+    appStorage.sync.set({ dockSites: newSites }).catch((error) => {
+      console.error("Failed to save dock order:", error);
     });
   }
 
@@ -806,7 +804,11 @@ function setupBookmarkDragReorder(container) {
 
     bookmarkCategories = newCategoriesData;
     currentSettings.bookmarkCategories = newCategoriesData;
-    chrome.storage.sync.set({ bookmarkCategories: newCategoriesData });
+    appStorage.sync.set({ bookmarkCategories: newCategoriesData }).catch(
+      (error) => {
+        console.error("Failed to save bookmark order:", error);
+      },
+    );
   }
 
   // --- Enter/Exit edit mode ---
@@ -1089,7 +1091,7 @@ function setupBookmarkDragReorder(container) {
 // Search history functions
 async function getSearchHistory() {
   try {
-    const result = await chrome.storage.local.get("searchHistory");
+    const result = await appStorage.local.get("searchHistory");
     return result.searchHistory || [];
   } catch {
     return [];
@@ -1108,7 +1110,7 @@ async function saveSearchToHistory(query) {
     // Limit to maxSearchHistory
     const maxItems = currentSettings.maxSearchHistory || 10;
     history = history.slice(0, maxItems);
-    await chrome.storage.local.set({ searchHistory: history });
+    await appStorage.local.set({ searchHistory: history });
   } catch (error) {
     console.error("Failed to save search history:", error);
   }
@@ -1556,7 +1558,7 @@ async function traichu() {
 }
 
 // Listen for storage changes (for real-time updates when settings change)
-chrome.storage.onChanged.addListener((changes, namespace) => {
+appStorage.onChanged.addListener((changes, namespace) => {
   if (namespace === "sync") {
     // Reload settings and reapply
     loadSettings().then((settings) => {
