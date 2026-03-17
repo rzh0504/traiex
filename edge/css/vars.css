@@ -1,0 +1,69 @@
+:root {
+  /*
+    Colors - adapted for browser theme #DDE2EF
+
+    HSL(a) is used for better control.
+    https://css-tricks.com/hsl-hsla-is-great-for-programmatic-color-control/
+    https://css-tricks.com/color-alpha-anywhere/
+    */
+  --color-black-hsl: 240 21% 15%; /* #1E1E2E - Catppuccin Mocha Base */
+  --color-black: hsl(var(--color-black-hsl));
+  --color-orange-hsl: 19 88% 53%; /* #F05E1C */
+  --color-orange: hsl(var(--color-orange-hsl));
+  --color-white-hsl: 60 100% 99%; /* #FFFFFC */
+  --color-white: hsl(var(--color-white-hsl));
+
+  /* Browser theme color #DDE2EF */
+  --color-theme-hsl: 224 32% 90%; /* #DDE2EF */
+  --color-theme: hsl(var(--color-theme-hsl));
+  --color-theme-dark-hsl: 224 25% 35%; /* Darker accent for text */
+  --color-theme-dark: hsl(var(--color-theme-dark-hsl));
+  --color-theme-accent-hsl: 224 50% 55%; /* Accent blue */
+  --color-theme-accent: hsl(var(--color-theme-accent-hsl));
+
+  /* Font-families */
+  --font-monospace:
+    "Fira Code", ui-monospace, SFMono-Regular, SF Mono, Menlo, Consolas,
+    Liberation Mono, monospace;
+  --font-sans-serif:
+    -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif,
+    "Apple Color Emoji", "Segoe UI Emoji";
+
+  /* Font-sizing */
+  --font-size-body: 1rem; /* 16px */
+
+  /* Spacing */
+  --spacing-xs: 0.25rem; /* 4px */
+  --spacing-s: 0.5rem; /* 8px */
+  --spacing-m: 1rem;
+  --spacing-l: 2rem; /* 32px */
+  --spacing-xl: 4rem; /* 64px */
+
+  /* SVGs - Search icons using external files from assets folder */
+  /* Note: These icons use #717A95 fill color from the SVG files */
+  --svg-google: url("../assets/logo-google.svg");
+  --svg-bing: url("../assets/bing.svg");
+  --svg-ddg: url("../assets/duckduckgo.svg");
+  --svg-baidu: url("../assets/baidu.svg");
+  --svg-search: url("../assets/search.svg");
+}
+
+/* Dark Mode */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --primary-background-color: var(--color-black);
+    --primary-font-color: var(--color-white);
+    --primary-link-color: hsl(var(--color-white-hsl) / 0.5);
+    --primary-link-hover-color: var(--color-white);
+  }
+}
+
+/* Light Mode - adapted for browser theme #DDE2EF */
+@media (prefers-color-scheme: light) {
+  :root {
+    --primary-background-color: var(--color-theme); /* #DDE2EF */
+    --primary-font-color: var(--color-theme-dark);
+    --primary-link-color: hsl(var(--color-theme-dark-hsl) / 0.7);
+    --primary-link-hover-color: var(--color-theme-dark);
+  }
+}

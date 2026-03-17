@@ -1,0 +1,31 @@
+This extension replaces the Microsoft Edge new tab page.
+
+No login, account, subscription, invitation code, or external setup is required for testing.
+
+Permissions used:
+- storage
+
+How to test:
+1. Install the extension package.
+2. Open a new tab in Microsoft Edge.
+3. Verify that the traiex new tab page is displayed.
+4. Test search from the search box.
+5. Open Settings from the page and verify options such as theme, language, quick links, bookmarks, import/export, and search history.
+
+Data handling:
+- Settings, dock items, and bookmark data are stored in browser storage.
+- Optional search history is stored locally on the device.
+- No traiex backend or account system is used.
+
+Third-party requests:
+- Search queries are sent to the user-selected search engine when a search is submitted.
+- Bookmark favicon requests use DuckDuckGo's icon service.
+- Opened websites receive normal browser requests when the user navigates to them.
+
+Region or market differences:
+- No known region-specific feature differences inside the extension.
+- Search results may differ depending on the selected search engine and user location.
+
+Additional notes:
+- All major functionality is available immediately after installation.
+- This submission is the Microsoft Edge version of the extension package.

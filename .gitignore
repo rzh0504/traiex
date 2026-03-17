@@ -47,3 +47,5 @@ src/
 .env
 .env.local
 .env.*.local
+.github/copilot-instructions.md
+.github/copilot-instructions.md
