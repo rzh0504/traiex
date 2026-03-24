@@ -1,16 +1,6 @@
 // defaultSettings and getFaviconUrl are loaded from js/utils.js
 
-// Search engine configurations
-const searchEngines = {
-  google: { name: "Google", url: "https://www.google.com/search", param: "q" },
-  bing: { name: "Bing", url: "https://www.bing.com/search", param: "q" },
-  duckduckgo: {
-    name: "DuckDuckGo",
-    url: "https://duckduckgo.com/",
-    param: "q",
-  },
-  baidu: { name: "百度", url: "https://www.baidu.com/s", param: "wd" },
-};
+const searchApi = globalThis.chrome?.search || globalThis.browser?.search || null;
 
 // Default bookmark categories are loaded from js/data.js
 
@@ -61,21 +51,7 @@ function applySettings(settings) {
     bookmarksSection.style.marginTop = settings.showDock ? "" : "2rem";
   }
 
-  // Apply search engine
-  const searchForm = document.querySelector("#search form");
   const searchInput = document.getElementById("q");
-  if (searchForm) {
-    const engine = searchEngines[settings.searchEngine] || searchEngines.google;
-    searchForm.action = engine.url;
-    searchForm.target = settings.linkTarget || "_blank";
-
-    // Update input name attribute for the correct parameter
-    if (searchInput) {
-      searchInput.name = engine.param;
-      // Set data attribute for CSS-based icon switching
-      searchInput.dataset.engine = settings.searchEngine;
-    }
-  }
 
   // Apply search box border radius
   if (searchInput && settings.searchBorderRadius !== undefined) {
@@ -1088,291 +1064,6 @@ function setupBookmarkDragReorder(container) {
   );
 }
 
-// Search history functions
-async function getSearchHistory() {
-  try {
-    const result = await appStorage.local.get("searchHistory");
-    return result.searchHistory || [];
-  } catch {
-    return [];
-  }
-}
-
-async function saveSearchToHistory(query) {
-  if (!query || !currentSettings.saveSearchHistory) return;
-
-  try {
-    let history = await getSearchHistory();
-    // Remove duplicate if exists
-    history = history.filter((item) => item !== query);
-    // Add to beginning
-    history.unshift(query);
-    // Limit to maxSearchHistory
-    const maxItems = currentSettings.maxSearchHistory || 10;
-    history = history.slice(0, maxItems);
-    await appStorage.local.set({ searchHistory: history });
-  } catch (error) {
-    console.error("Failed to save search history:", error);
-  }
-}
-
-// Debounce function for input handling
-function debounce(func, wait) {
-  let timeout;
-  return function executedFunction(...args) {
-    clearTimeout(timeout);
-    timeout = setTimeout(() => func.apply(this, args), wait);
-  };
-}
-
-// Get all bookmarks from categories (flattened)
-function getAllBookmarks() {
-  const categories = bookmarkCategories || defaultBookmarkCategories;
-  if (!categories) return [];
-
-  const bookmarks = [];
-  categories.forEach((category) => {
-    if (category.bookmarks) {
-      category.bookmarks.forEach((bookmark) => {
-        bookmarks.push({
-          name: bookmark.name,
-          url: bookmark.url,
-          category: category.name,
-        });
-      });
-    }
-  });
-  return bookmarks;
-}
-
-// Get local matches for the query
-async function getLocalMatches(query) {
-  const results = [];
-  const lowerQuery = query.toLowerCase();
-
-  // Match search history
-  if (currentSettings.saveSearchHistory) {
-    const history = await getSearchHistory();
-    history.forEach((item) => {
-      const lowerItem = item.toLowerCase();
-      const matchIndex = lowerItem.indexOf(lowerQuery);
-      if (matchIndex !== -1) {
-        results.push({
-          type: "history",
-          text: item,
-          url: null,
-          matchIndex: matchIndex,
-          matchLength: query.length,
-        });
-      }
-    });
-  }
-
-  // Match bookmarks (name and URL)
-  const bookmarks = getAllBookmarks();
-  bookmarks.forEach((bookmark) => {
-    const lowerName = bookmark.name.toLowerCase();
-    const lowerUrl = bookmark.url.toLowerCase();
-
-    // Try to match name first
-    let matchIndex = lowerName.indexOf(lowerQuery);
-    if (matchIndex !== -1) {
-      results.push({
-        type: "bookmark",
-        text: bookmark.name,
-        url: bookmark.url,
-        category: bookmark.category,
-        matchIndex: matchIndex,
-        matchLength: query.length,
-      });
-    } else {
-      // Try to match URL
-      matchIndex = lowerUrl.indexOf(lowerQuery);
-      if (matchIndex !== -1) {
-        results.push({
-          type: "bookmark",
-          text: bookmark.name,
-          url: bookmark.url,
-          category: bookmark.category,
-          matchIndex: -1, // URL match, no highlight on name
-          matchLength: query.length,
-        });
-      }
-    }
-  });
-
-  // Sort: exact matches first, then by match position
-  results.sort((a, b) => {
-    // Exact match priority
-    const aExact = a.text.toLowerCase() === lowerQuery;
-    const bExact = b.text.toLowerCase() === lowerQuery;
-    if (aExact && !bExact) return -1;
-    if (!aExact && bExact) return 1;
-
-    // History items first when same match position
-    if (a.type === "history" && b.type !== "history") return -1;
-    if (a.type !== "history" && b.type === "history") return 1;
-
-    // Earlier match position is better
-    if (a.matchIndex !== b.matchIndex) {
-      if (a.matchIndex === -1) return 1;
-      if (b.matchIndex === -1) return -1;
-      return a.matchIndex - b.matchIndex;
-    }
-
-    return 0;
-  });
-
-  // Limit results
-  return results.slice(0, 10);
-}
-
-// Highlight matching text
-function highlightMatch(text, matchIndex, matchLength) {
-  if (matchIndex === -1 || matchLength === 0) {
-    return escapeHtml(text);
-  }
-  const before = escapeHtml(text.substring(0, matchIndex));
-  const match = escapeHtml(
-    text.substring(matchIndex, matchIndex + matchLength),
-  );
-  const after = escapeHtml(text.substring(matchIndex + matchLength));
-  return `${before}<mark class="search-match">${match}</mark>${after}`;
-}
-
-function createSearchSuggestionsDropdown(searchInput, searchContainer) {
-  // Create dropdown element
-  let dropdown = document.getElementById("search-history-dropdown");
-  if (!dropdown) {
-    dropdown = document.createElement("ul");
-    dropdown.id = "search-history-dropdown";
-    dropdown.className = "search-history-dropdown";
-    searchContainer.appendChild(dropdown);
-  }
-  return dropdown;
-}
-
-// Show search history (when input is empty)
-async function showSearchHistory(searchInput, dropdown) {
-  // Check focus BEFORE async operation
-  if (document.activeElement !== searchInput) {
-    dropdown.style.display = "none";
-    return;
-  }
-
-  if (!currentSettings.saveSearchHistory) {
-    dropdown.style.display = "none";
-    return;
-  }
-
-  const history = await getSearchHistory();
-
-  // Check focus AGAIN after async operation (user may have clicked away)
-  if (document.activeElement !== searchInput) {
-    dropdown.style.display = "none";
-    return;
-  }
-
-  if (history.length === 0) {
-    dropdown.style.display = "none";
-    return;
-  }
-
-  dropdown.innerHTML = history
-    .map(
-      (item) =>
-        `<li class="search-history-item" data-type="history">${escapeHtml(item)}</li>`,
-    )
-    .join("");
-
-  dropdown.style.display = "block";
-
-  // Add mousedown handlers
-  dropdown.querySelectorAll(".search-history-item").forEach((li, index) => {
-    li.addEventListener("mousedown", (e) => {
-      e.preventDefault();
-      const query = history[index];
-      saveSearchToHistory(query);
-      navigateToUrl(
-        buildSearchUrl(searchInput.form, searchInput, query),
-        currentSettings.linkTarget,
-      );
-    });
-  });
-}
-
-// Show search suggestions (when input has content)
-async function showSearchSuggestions(searchInput, dropdown, query) {
-  // Check focus BEFORE async operation
-  if (document.activeElement !== searchInput) {
-    dropdown.style.display = "none";
-    return;
-  }
-
-  const matches = await getLocalMatches(query);
-
-  // Check focus AGAIN after async operation (user may have clicked away)
-  if (document.activeElement !== searchInput) {
-    dropdown.style.display = "none";
-    return;
-  }
-
-  if (matches.length === 0) {
-    dropdown.style.display = "none";
-    return;
-  }
-
-  dropdown.innerHTML = matches
-    .map((match) => {
-      const typeClass =
-        match.type === "bookmark"
-          ? "search-bookmark-item"
-          : "search-history-item";
-      const typeIcon = match.type === "bookmark" ? "🔖" : "🕐";
-      const highlightedText = highlightMatch(
-        match.text,
-        match.matchIndex,
-        match.matchLength,
-      );
-
-      return `<li class="${typeClass}" data-type="${match.type}" data-url="${match.url || ""}">
-            <span class="suggestion-icon">${typeIcon}</span>
-            <span class="suggestion-text">${highlightedText}</span>
-        </li>`;
-    })
-    .join("");
-
-  dropdown.style.display = "block";
-
-  // Add mousedown handlers
-  dropdown.querySelectorAll("li").forEach((li, index) => {
-    li.addEventListener("mousedown", (e) => {
-      e.preventDefault();
-      const match = matches[index];
-
-      if (match.type === "bookmark" && match.url) {
-        // Navigate directly to bookmark URL
-        navigateToUrl(match.url, currentSettings.linkTarget);
-      } else {
-        // Search for the history item
-        saveSearchToHistory(match.text);
-        navigateToUrl(
-          buildSearchUrl(searchInput.form, searchInput, match.text),
-          currentSettings.linkTarget,
-        );
-      }
-    });
-  });
-}
-
-function hideSuggestions(dropdown) {
-  if (dropdown) {
-    dropdown.style.display = "none";
-    // Reset selected index when hiding
-    dropdown.dataset.selectedIndex = "-1";
-  }
-}
-
 function navigateToUrl(url, target = currentSettings.linkTarget || "_blank") {
   if (target === "_self") {
     window.location.assign(url);
@@ -1382,136 +1073,43 @@ function navigateToUrl(url, target = currentSettings.linkTarget || "_blank") {
   window.open(url, target, "noopener");
 }
 
-function buildSearchUrl(searchForm, searchInput, query) {
-  const url = new URL(searchForm.action);
-  url.searchParams.set(searchInput.name, query);
-  return url.toString();
-}
-
-// Keyboard navigation for dropdown
-function handleDropdownKeyboard(e, searchInput, dropdown, searchForm) {
-  if (dropdown.style.display === "none") return false;
-
-  const items = dropdown.querySelectorAll("li");
-  if (items.length === 0) return false;
-
-  let selectedIndex = parseInt(dropdown.dataset.selectedIndex || "-1");
-
-  if (e.key === "ArrowDown") {
-    e.preventDefault();
-    selectedIndex = Math.min(selectedIndex + 1, items.length - 1);
-  } else if (e.key === "ArrowUp") {
-    e.preventDefault();
-    selectedIndex = Math.max(selectedIndex - 1, -1);
-  } else if (e.key === "Enter" && selectedIndex >= 0) {
-    e.preventDefault();
-    items[selectedIndex].dispatchEvent(new MouseEvent("mousedown"));
-    return true;
-  } else {
+async function queryDefaultSearchProvider(query) {
+  const trimmedQuery = query.trim();
+  if (!trimmedQuery) {
     return false;
   }
 
-  // Update visual selection
-  items.forEach((item, i) => {
-    item.classList.toggle("selected", i === selectedIndex);
-  });
-  dropdown.dataset.selectedIndex = selectedIndex.toString();
-
-  // Update input value to show selected item text
-  if (selectedIndex >= 0) {
-    const textEl = items[selectedIndex].querySelector(".suggestion-text");
-    if (textEl) {
-      // Store original value if not stored
-      if (!searchInput.dataset.originalValue) {
-        searchInput.dataset.originalValue = searchInput.value;
-      }
-      searchInput.value = textEl.textContent;
-    } else {
-      // For history items without .suggestion-text
-      if (!searchInput.dataset.originalValue) {
-        searchInput.dataset.originalValue = searchInput.value;
-      }
-      searchInput.value = items[selectedIndex].textContent;
-    }
-  } else {
-    // Restore original value when going back up
-    if (searchInput.dataset.originalValue !== undefined) {
-      searchInput.value = searchInput.dataset.originalValue;
-      delete searchInput.dataset.originalValue;
-    }
+  if (!searchApi?.query) {
+    console.error("Chrome Search API is unavailable.");
+    return false;
   }
 
-  return true;
+  try {
+    await searchApi.query({
+      text: trimmedQuery,
+      disposition: "CURRENT_TAB",
+    });
+    return true;
+  } catch (error) {
+    console.error("Failed to search via Chrome default provider:", error);
+    return false;
+  }
 }
-
-// escapeHtml is loaded from js/utils.js
 
 // Search setup
 function setupSearch() {
   const searchForm = document.querySelector("#search form");
   const searchInput = document.getElementById("q");
-  const searchContainer = document.getElementById("search");
-
-  if (searchForm && searchInput && searchContainer) {
-    const dropdown = createSearchSuggestionsDropdown(
-      searchInput,
-      searchContainer,
-    );
-    dropdown.dataset.selectedIndex = "-1";
-
-    // Debounced search suggestion handler
-    const debouncedSearch = debounce(async (query) => {
-      if (query.trim()) {
-        await showSearchSuggestions(searchInput, dropdown, query.trim());
-      } else {
-        await showSearchHistory(searchInput, dropdown);
-      }
-      // Reset selection when results change
-      dropdown.dataset.selectedIndex = "-1";
-    }, 200);
-
-    // Helper function to show dropdown based on current input value
-    const showDropdownIfNeeded = () => {
-      if (!searchInput.value.trim()) {
-        showSearchHistory(searchInput, dropdown);
-      } else {
-        showSearchSuggestions(searchInput, dropdown, searchInput.value.trim());
-      }
-    };
-
-    // Show dropdown on click (not focus) - this prevents dropdown from showing
-    // when focus comes from browser UI like bookmark bar
-    searchInput.addEventListener("click", showDropdownIfNeeded);
-
-    // Hide suggestions immediately on blur
-    searchInput.addEventListener("blur", () => {
-      hideSuggestions(dropdown);
-      delete searchInput.dataset.originalValue;
-    });
-
-    // Keyboard navigation for dropdown
-    searchInput.addEventListener("keydown", (e) => {
-      if (["ArrowDown", "ArrowUp", "Enter"].includes(e.key)) {
-        handleDropdownKeyboard(e, searchInput, dropdown, searchForm);
-      }
-    });
-
-    // Debounced input handling
-    searchInput.addEventListener("input", () => {
-      delete searchInput.dataset.originalValue; // Clear stored value on manual input
-      debouncedSearch(searchInput.value);
-    });
-
-    // Save search and clear input on submit
-    searchForm.addEventListener("submit", () => {
+  if (searchForm && searchInput) {
+    // Submit directly via Chrome's default search provider
+    searchForm.addEventListener("submit", async (event) => {
+      event.preventDefault();
       const query = searchInput.value.trim();
-      if (query) {
-        saveSearchToHistory(query);
-      }
-      // Clear input with a small delay to allow form submission to process
-      setTimeout(() => {
-        searchInput.value = "";
-      }, 10);
+      if (!query) return;
+
+      await queryDefaultSearchProvider(query);
+      searchInput.value = "";
+      searchInput.blur();
     });
 
     // Clear input and remove focus on page load/show (handles back button navigation/bfcache)
@@ -1548,7 +1146,7 @@ async function traichu() {
   setupDockDragReorder(document.getElementById("dock"));
   setupBookmarkDragReorder(document.getElementById("bookmarks"));
 
-  // Apply settings (visibility, theme, search engine)
+  // Apply settings (visibility, theme, search box styling)
   applySettings(settings);
 
   // Reveal content with smooth transition

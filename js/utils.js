@@ -7,7 +7,6 @@ const defaultSettings = {
   showDateTime: true,
   showDock: true,
   showBookmarks: true,
-  searchEngine: "google",
   theme: "auto",
   lightBgColor: "#DDE2EF",
   searchBorderRadius: 20,
@@ -15,8 +14,6 @@ const defaultSettings = {
   linkTarget: "_blank", // '_blank' for new tab, '_self' for same tab
   showDockLabels: false, // Show text labels under dock icons
   language: "zh-CN", // 'zh-CN' for Chinese, 'en' for English
-  saveSearchHistory: false, // Save search history locally
-  maxSearchHistory: 10, // Maximum number of search history items
   dockSites: null,
 };
 

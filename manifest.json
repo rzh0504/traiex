@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "traiex",
   "version": "1.1.0",
-  "description": "Minimal Microsoft Edge new tab page with search, bookmarks, quick links, themes, and syncable settings.",
+  "description": "Minimal Chrome new tab page with default search, bookmarks, quick links, themes, and syncable settings.",
   "icons": {
     "16": "favicon-16x16.png",
     "32": "favicon-32x32.png",
@@ -16,5 +16,5 @@
     "page": "options.html",
     "open_in_tab": true
   },
-  "permissions": ["storage"]
+  "permissions": ["storage", "search"]
 }

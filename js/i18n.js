@@ -29,10 +29,11 @@ const translations = {
         show_bookmarks_desc: '显示书签链接列表',
         
         // Search settings
-        search_engine: '默认搜索引擎',
-        search_engine_desc: '选择用于搜索的引擎',
+        search_provider: '搜索提供商',
+        search_provider_desc: '始终使用 Chrome 当前默认搜索引擎',
+        chrome_default_search: '跟随 Chrome 默认设置',
         link_target: '链接打开方式',
-        link_target_desc: '选择点击链接时的打开方式',
+        link_target_desc: '选择 Dock 和书签链接的打开方式',
         new_tab: '新标签页',
         current_tab: '当前标签页',
         
@@ -163,10 +164,11 @@ const translations = {
         show_bookmarks_desc: 'Display bookmark links list',
         
         // Search settings
-        search_engine: 'Default Search Engine',
-        search_engine_desc: 'Choose your preferred search engine',
+        search_provider: 'Search Provider',
+        search_provider_desc: 'Always use Chrome\'s current default search engine',
+        chrome_default_search: 'Follow Chrome Default',
         link_target: 'Link Behavior',
-        link_target_desc: 'Choose how to open links',
+        link_target_desc: 'Choose how Dock and bookmark links open',
         new_tab: 'New Tab',
         current_tab: 'Current Tab',
         

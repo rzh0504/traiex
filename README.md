@@ -9,15 +9,14 @@
 ## ✨ Features
 
 - **🕐 Time & Date Display** - Clean time display using your browser's current timezone, with Chinese and English date formats
-- **🔍 Multi-Search Engine** - Google, Bing, DuckDuckGo, Baidu, with configurable same-tab or new-tab opening
-- **🧠 Local Search Suggestions** - Search history and bookmark matches appear as you type, with keyboard navigation support
+- **🔍 Chrome Default Search** - Search always uses Chrome's current default search provider
 - **🚀 Quick Access Dock** - Preset site library, add/remove management, optional labels, and drag-and-drop reordering
 - **📚 Categorized Bookmarks** - Organize bookmarks into categories, rename categories inline, and drag to reorder categories or items
 - **✋ Long-Press Reordering** - Long-press Dock icons or bookmarks on the new tab page to enter reorder mode on desktop and touch devices
 - **🎨 Theme Support** - Light/Dark mode with system preference detection and custom background colors
-- **🎛️ Fine-Grained Customization** - Search box radius, bookmark font weight, visibility toggles, and per-link target behavior
+- **🎛️ Fine-Grained Customization** - Search box radius, bookmark font weight, visibility toggles, and Dock/bookmark link behavior
 - **🌐 Bilingual Interface** - Full Chinese and English language support
-- **💾 Sync + Local Storage** - Settings sync across Chrome/Edge devices, while optional search history stays local
+- **💾 Syncable Settings** - Settings sync across Chrome/Edge devices through browser storage
 - **📦 Import/Export** - Backup and restore all your settings, Dock sites, and bookmarks
 - **📱 Touch-Friendly Editing** - Mobile drag handling is supported for Dock and bookmark/category management
 
@@ -56,15 +55,6 @@ Click the **⚙️ Settings** button (bottom right corner) or right-click the ex
 - Show/hide bookmarks
 - Interface language (Chinese/English)
 
-### Search Settings
-
-- Default search engine (Google, Bing, DuckDuckGo, Baidu)
-- Link open behavior (new tab or current tab)
-- Optional local search history
-- Search history count limit
-- Clear saved search history
-- Live suggestions from saved history and existing bookmarks
-
 ### Appearance
 
 - Theme mode (Auto/Light/Dark)
@@ -96,14 +86,11 @@ Click the **⚙️ Settings** button (bottom right corner) or right-click the ex
 - Import settings from backup file
 - Reset all settings, Dock sites, and bookmarks to defaults
 - Sync settings through browser account storage
-- Keep search history local to the current device only
 
 ## 🧭 Usage Tips
 
 - Long-press Dock icons or bookmarks on the new tab page to enter reorder mode, then drag to sort.
 - Click outside the active reorder area or press `Escape` to exit reorder mode.
-- Type in the search box to see bookmark/history suggestions, or focus the empty search box to see saved search history.
-- Use arrow keys to navigate the suggestion list and press `Enter` to open the selected result.
 
 ## 🔧 Keyboard Shortcuts
 
@@ -111,8 +98,6 @@ Click the **⚙️ Settings** button (bottom right corner) or right-click the ex
 | ------------------- | ------------------------------------------------ |
 | `/`                 | Focus search box                                 |
 | `Escape`            | Blur current input / exit reorder mode           |
-| `Arrow Up/Down`     | Navigate search suggestions or saved history     |
-| `Enter`             | Open the selected suggestion                     |
 
 ## 📁 Project Structure
 

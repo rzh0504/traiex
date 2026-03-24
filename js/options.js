@@ -20,7 +20,6 @@ const form = document.getElementById("settings-form");
 const showDateTimeCheckbox = document.getElementById("showDateTime");
 const showDockCheckbox = document.getElementById("showDock");
 const showBookmarksCheckbox = document.getElementById("showBookmarks");
-const searchEngineSelect = document.getElementById("searchEngine");
 const themeSelect = document.getElementById("theme");
 const lightBgColorInput = document.getElementById("lightBgColor");
 const colorValueSpan = document.getElementById("colorValue");
@@ -41,15 +40,6 @@ const languageSelect = document.getElementById("language");
 const exportBtn = document.getElementById("export-btn");
 const importBtn = document.getElementById("import-btn");
 const importFileInput = document.getElementById("import-file");
-const saveSearchHistoryCheckbox = document.getElementById("saveSearchHistory");
-const maxSearchHistorySelect = document.getElementById("maxSearchHistory");
-const maxSearchHistorySection = document.getElementById(
-  "maxSearchHistorySection",
-);
-const clearSearchHistorySection = document.getElementById(
-  "clearSearchHistorySection",
-);
-const clearSearchHistoryBtn = document.getElementById("clearSearchHistoryBtn");
 
 // Touch drag state for mobile support
 let touchDragState = {
@@ -620,7 +610,6 @@ async function loadSettings() {
     showDateTimeCheckbox.checked = result.showDateTime;
     showDockCheckbox.checked = result.showDock;
     showBookmarksCheckbox.checked = result.showBookmarks;
-    searchEngineSelect.value = result.searchEngine;
     themeSelect.value = result.theme;
     updateColorDisplay(result.lightBgColor);
     updateBorderRadiusDisplay(result.searchBorderRadius);
@@ -631,11 +620,6 @@ async function loadSettings() {
 
     // Apply theme to options page
     applyOptionsTheme();
-
-    // Search history settings
-    saveSearchHistoryCheckbox.checked = result.saveSearchHistory || false;
-    maxSearchHistorySelect.value = result.maxSearchHistory || 10;
-    updateSearchHistoryVisibility(result.saveSearchHistory || false);
 
     // Initialize i18n with saved language
     initI18n(result.language || "zh-CN");
@@ -658,7 +642,6 @@ async function loadSettings() {
     showDateTimeCheckbox.checked = defaultSettings.showDateTime;
     showDockCheckbox.checked = defaultSettings.showDock;
     showBookmarksCheckbox.checked = defaultSettings.showBookmarks;
-    searchEngineSelect.value = defaultSettings.searchEngine;
     themeSelect.value = defaultSettings.theme;
     updateColorDisplay(defaultSettings.lightBgColor);
     updateBorderRadiusDisplay(defaultSettings.searchBorderRadius);
@@ -666,9 +649,6 @@ async function loadSettings() {
     linkTargetSelect.value = defaultSettings.linkTarget;
     showDockLabelsCheckbox.checked = defaultSettings.showDockLabels;
     languageSelect.value = defaultSettings.language;
-    saveSearchHistoryCheckbox.checked = defaultSettings.saveSearchHistory;
-    maxSearchHistorySelect.value = defaultSettings.maxSearchHistory;
-    updateSearchHistoryVisibility(defaultSettings.saveSearchHistory);
     initI18n(defaultSettings.language);
     applyOptionsTheme();
     bookmarkCategories = JSON.parse(JSON.stringify(defaultBookmarkCategories));
@@ -686,7 +666,6 @@ async function saveSettings(e) {
     showDateTime: showDateTimeCheckbox.checked,
     showDock: showDockCheckbox.checked,
     showBookmarks: showBookmarksCheckbox.checked,
-    searchEngine: searchEngineSelect.value,
     theme: themeSelect.value,
     lightBgColor: lightBgColorInput.value,
     searchBorderRadius: parseInt(searchBorderRadiusInput.value),
@@ -694,8 +673,6 @@ async function saveSettings(e) {
     linkTarget: linkTargetSelect.value,
     showDockLabels: showDockLabelsCheckbox.checked,
     language: languageSelect.value,
-    saveSearchHistory: saveSearchHistoryCheckbox.checked,
-    maxSearchHistory: parseInt(maxSearchHistorySelect.value),
     bookmarkCategories: bookmarkCategories,
     dockSites: currentDockSites,
   };
@@ -725,7 +702,6 @@ async function resetSettings() {
       showDateTimeCheckbox.checked = defaultSettings.showDateTime;
       showDockCheckbox.checked = defaultSettings.showDock;
       showBookmarksCheckbox.checked = defaultSettings.showBookmarks;
-      searchEngineSelect.value = defaultSettings.searchEngine;
       themeSelect.value = defaultSettings.theme;
       updateColorDisplay(defaultSettings.lightBgColor);
       updateBorderRadiusDisplay(defaultSettings.searchBorderRadius);
@@ -735,9 +711,6 @@ async function resetSettings() {
       languageSelect.value = defaultSettings.language;
       setLanguage(defaultSettings.language);
       applyOptionsTheme();
-      saveSearchHistoryCheckbox.checked = defaultSettings.saveSearchHistory;
-      maxSearchHistorySelect.value = defaultSettings.maxSearchHistory;
-      updateSearchHistoryVisibility(defaultSettings.saveSearchHistory);
       bookmarkCategories = JSON.parse(
         JSON.stringify(defaultBookmarkCategories),
       );
@@ -814,7 +787,6 @@ function exportSettings() {
     showDateTime: showDateTimeCheckbox.checked,
     showDock: showDockCheckbox.checked,
     showBookmarks: showBookmarksCheckbox.checked,
-    searchEngine: searchEngineSelect.value,
     theme: themeSelect.value,
     lightBgColor: lightBgColorInput.value,
     searchBorderRadius: parseInt(searchBorderRadiusInput.value),
@@ -822,8 +794,6 @@ function exportSettings() {
     linkTarget: linkTargetSelect.value,
     showDockLabels: showDockLabelsCheckbox.checked,
     language: languageSelect.value,
-    saveSearchHistory: saveSearchHistoryCheckbox.checked,
-    maxSearchHistory: parseInt(maxSearchHistorySelect.value),
     bookmarkCategories: bookmarkCategories,
     dockSites: currentDockSites,
   };
@@ -858,7 +828,6 @@ async function importSettings(file) {
       showDockCheckbox.checked = settings.showDock;
     if (settings.showBookmarks !== undefined)
       showBookmarksCheckbox.checked = settings.showBookmarks;
-    if (settings.searchEngine) searchEngineSelect.value = settings.searchEngine;
     if (settings.theme) themeSelect.value = settings.theme;
     if (settings.lightBgColor) updateColorDisplay(settings.lightBgColor);
     if (settings.searchBorderRadius !== undefined)
@@ -871,13 +840,6 @@ async function importSettings(file) {
     if (settings.language) {
       languageSelect.value = settings.language;
       setLanguage(settings.language);
-    }
-    if (settings.saveSearchHistory !== undefined) {
-      saveSearchHistoryCheckbox.checked = settings.saveSearchHistory;
-      updateSearchHistoryVisibility(settings.saveSearchHistory);
-    }
-    if (settings.maxSearchHistory !== undefined) {
-      maxSearchHistorySelect.value = settings.maxSearchHistory;
     }
     if (Array.isArray(settings.bookmarkCategories)) {
       bookmarkCategories = settings.bookmarkCategories;
@@ -910,25 +872,6 @@ function setupImportExport() {
   });
 }
 
-// Update search history related section visibility
-function updateSearchHistoryVisibility(isEnabled) {
-  maxSearchHistorySection.style.display = isEnabled ? "" : "none";
-  clearSearchHistorySection.style.display = isEnabled ? "" : "none";
-}
-
-// Clear search history from local storage
-async function clearSearchHistory() {
-  if (confirm(t("clear_search_history_confirm"))) {
-    try {
-      await appStorage.local.remove("searchHistory");
-      showToast(t("search_history_cleared"), "success");
-    } catch (error) {
-      console.error("Failed to clear search history:", error);
-      showToast(t("clear_failed"), "error");
-    }
-  }
-}
-
 // Setup live preview listeners (no auto-save, just instant UI feedback)
 function setupLivePreview() {
   // Language selector needs special handling for instant UI update
@@ -955,11 +898,6 @@ function setupLivePreview() {
       requestAnimationFrame(() => applyOptionsTheme());
     });
   });
-
-  // Search history toggle needs special handling for visibility
-  saveSearchHistoryCheckbox.addEventListener("change", () => {
-    updateSearchHistoryVisibility(saveSearchHistoryCheckbox.checked);
-  });
 }
 
 // Event listeners
@@ -974,9 +912,6 @@ document.addEventListener("DOMContentLoaded", () => {
   setupBorderRadiusInput();
   setupImportExport();
   setupLivePreview();
-
-  // Clear search history button
-  clearSearchHistoryBtn.addEventListener("click", clearSearchHistory);
 
   // Global touch event listeners for mobile drag support
   document.addEventListener("touchmove", handleCategoryTouchMove, {

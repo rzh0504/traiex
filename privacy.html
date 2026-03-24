@@ -22,7 +22,7 @@
         This page explains what data traiex handles, where that data is stored,
         and when information may be sent to third-party services.
       </p>
-      <p class="updated">Last updated: 2026-03-17</p>
+      <p class="updated">Last updated: 2026-03-25</p>
     </header>
 
     <section class="summary" aria-label="Privacy summary">
@@ -36,7 +36,7 @@
       </article>
       <article>
         <h2>Third-party requests</h2>
-        <p>Search engines, favicon requests, and opened sites receive normal requests.</p>
+        <p>Chrome default search, favicon requests, and opened sites receive normal requests.</p>
       </article>
     </section>
 
@@ -51,8 +51,9 @@
           <h3>What traiex does</h3>
           <p>
             traiex is a browser new tab extension. It shows time and date,
-            provides a search box, lets you manage quick links and bookmarks,
-            and stores your preferences locally in the browser.
+            provides a search box that uses Chrome's default search provider,
+            lets you manage quick links and bookmarks, and stores your
+            preferences in browser storage.
           </p>
         </section>
 
@@ -65,10 +66,6 @@
               browser profile.
             </li>
             <li>
-              Optional search history is stored with
-              <code>chrome.storage.local</code> only on the current device.
-            </li>
-            <li>
               The extension does not create an account, run its own backend, or
               upload your data to a traiex server.
             </li>
@@ -79,8 +76,9 @@
           <h3>When data is sent to third parties</h3>
           <ul>
             <li>
-              When you submit a search, the search term is sent to the search
-              engine you selected, such as Google, Bing, DuckDuckGo, or Baidu.
+              When you submit a search, the text you enter is sent through the
+              Chrome Search API to your current default search provider in
+              Chrome.
             </li>
             <li>
               When bookmark favicons are displayed, the bookmark domain is sent
@@ -95,10 +93,17 @@
 
         <section class="policy-block">
           <h3>Permissions</h3>
-          <p>
-            traiex requests the <code>storage</code> permission only. This is used
-            to save your settings and optional local search history.
-          </p>
+          <ul>
+            <li>
+              <code>storage</code> is used to save settings, dock items, and
+              bookmark categories in browser storage.
+            </li>
+            <li>
+              <code>search</code> is used only to submit the user's typed query
+              from the new tab search box through Chrome's Search API, so the
+              extension respects the user's current default search provider.
+            </li>
+          </ul>
         </section>
 
         <section class="policy-block">
@@ -113,8 +118,6 @@
         <section class="policy-block">
           <h3>Your choices</h3>
           <ul>
-            <li>You can disable search history in the extension settings.</li>
-            <li>You can clear saved search history from the settings page.</li>
             <li>
               You can remove synced settings by resetting the extension or
               uninstalling it from your browser.
@@ -137,7 +140,7 @@
         <section class="policy-block">
           <h3>traiex 会做什么</h3>
           <p>
-            traiex 是一个浏览器新标签页扩展。它会显示时间和日期，提供搜索框，支持管理快捷链接和书签，并把你的偏好设置保存在浏览器中。
+            traiex 是一个浏览器新标签页扩展。它会显示时间和日期，提供一个使用 Chrome 当前默认搜索引擎的搜索框，支持管理快捷链接和书签，并把你的偏好设置保存在浏览器存储中。
           </p>
         </section>
 
@@ -149,10 +152,6 @@
               <code>chrome.storage.sync</code> 中，以便跟随已登录的浏览器账号同步。
             </li>
             <li>
-              可选的搜索历史会保存在 <code>chrome.storage.local</code>
-              中，只保存在当前设备。
-            </li>
-            <li>
               扩展不会创建 traiex 自己的账号体系，也不会把这些数据上传到 traiex 自建服务器。
             </li>
           </ul>
@@ -162,7 +161,7 @@
           <h3>什么时候会向第三方发送数据</h3>
           <ul>
             <li>
-              当你提交搜索时，搜索词会发送到你选择的搜索引擎，例如 Google、Bing、DuckDuckGo 或百度。
+              当你提交搜索时，你输入的搜索词会通过 Chrome Search API 发送给 Chrome 当前默认搜索提供商。
             </li>
             <li>
               当页面显示书签 favicon 时，书签域名会发送到 DuckDuckGo 的 favicon 服务，用于请求图标图片。
@@ -175,9 +174,14 @@
 
         <section class="policy-block">
           <h3>扩展权限</h3>
-          <p>
-            traiex 目前只申请了 <code>storage</code> 权限，用于保存设置和可选的本地搜索历史。
-          </p>
+          <ul>
+            <li>
+              <code>storage</code> 权限用于保存设置、Dock 站点和书签分类。
+            </li>
+            <li>
+              <code>search</code> 权限仅用于从新标签页搜索框提交用户主动输入的查询，并通过 Chrome Search API 遵循用户当前默认搜索设置。
+            </li>
+          </ul>
         </section>
 
         <section class="policy-block">
@@ -190,8 +194,6 @@
         <section class="policy-block">
           <h3>你的可控项</h3>
           <ul>
-            <li>你可以在设置页关闭搜索历史功能。</li>
-            <li>你可以在设置页清除已保存的搜索历史。</li>
             <li>你可以通过重置扩展设置或卸载扩展来移除相关数据。</li>
           </ul>
         </section>
