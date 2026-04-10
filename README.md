@@ -4,7 +4,11 @@
 
 > A minimal, beautiful, and customizable new tab page extension for Chrome/Edge browsers.
 
-[中文文档](README_zh.md)
+> [中文文档](README_zh.md)
+
+[![Chrome Web Store](https://developer.chrome.com/static/docs/webstore/branding/image/206x58-chrome-web-043497a3d766e.png?hl=en)](https://chromewebstore.google.com/detail/traiex/nfigoaidbgeleohgbljdiicaoicleldl)
+
+[![Edge Extension](https://user-images.githubusercontent.com/78568641/212470539-dd4d22a0-3af8-4fa7-9671-6df5b2e26a70.png)](https://microsoftedge.microsoft.com/addons/detail/traiex/kkjpkdokebijgkakacnogeckbikahoko)
 
 ## ✨ Features
 
@@ -94,14 +98,14 @@ Click the **⚙️ Settings** button (bottom right corner) or right-click the ex
 
 ## 🔧 Keyboard Shortcuts
 
-| Shortcut            | Action                                           |
-| ------------------- | ------------------------------------------------ |
-| `/`                 | Focus search box                                 |
-| `Escape`            | Blur current input / exit reorder mode           |
+| Shortcut | Action                                 |
+| -------- | -------------------------------------- |
+| `/`      | Focus search box                       |
+| `Escape` | Blur current input / exit reorder mode |
 
 ## 📁 Project Structure
 
-``` 
+```
 traiex/
 ├── assets/           # Search engine icons (SVG)
 ├── css/

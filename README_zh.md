@@ -6,6 +6,10 @@
 
 [English Documentation](README.md)
 
+[![Chrome Web Store](https://developer.chrome.com/static/docs/webstore/branding/image/206x58-chrome-web-043497a3d766e.png?hl=zh-cn)](https://chromewebstore.google.com/detail/traiex/nfigoaidbgeleohgbljdiicaoicleldl)
+
+[![Edge Extension](https://user-images.githubusercontent.com/78568641/212470539-dd4d22a0-3af8-4fa7-9671-6df5b2e26a70.png)](https://microsoftedge.microsoft.com/addons/detail/traiex/kkjpkdokebijgkakacnogeckbikahoko)
+
 ## ✨ 功能特点
 
 - **🕐 时间日期显示** - 使用浏览器当前时区显示时间，并支持中英文日期格式
@@ -94,10 +98,10 @@
 
 ## 🔧 快捷键
 
-| 快捷键           | 功能                         |
-| ---------------- | ---------------------------- |
-| `/`              | 聚焦搜索框                   |
-| `Escape`         | 取消当前输入焦点 / 退出排序  |
+| 快捷键   | 功能                        |
+| -------- | --------------------------- |
+| `/`      | 聚焦搜索框                  |
+| `Escape` | 取消当前输入焦点 / 退出排序 |
 
 ## 📁 项目结构
 
