@@ -145,3 +145,4 @@ MIT License - Feel free to use, modify, and distribute.
 - Font: [Fira Code](https://fonts.google.com/specimen/Fira+Code) via Google Fonts
 - Favicon service: [DuckDuckGo Icons API](https://icons.duckduckgo.com)
 - Icons: Inline SVGs from [Simple Icons](https://simpleicons.org/)
+- Community Support: [Linux.do](https://linux.do/)
