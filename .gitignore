@@ -25,6 +25,8 @@ Desktop.ini
 # Build artifacts
 dist/
 build/
+.output/
+.wxt/
 *.map
 
 # Logs

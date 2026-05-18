@@ -34,19 +34,20 @@
 
 ### From Source (Developer Mode)
 
-1. Clone or download this repository
-2. Open Chrome/Edge and navigate to `chrome://extensions/` (or `edge://extensions/`)
-3. Enable **Developer mode** (toggle in top right)
-4. Click **Load unpacked** and select the `traiex` folder
-5. Open a new tab to see traiex in action!
+1. Clone this repository and install dependencies: `pnpm install`
+2. Build the target output: Chrome uses `pnpm build`, Edge uses `pnpm build:edge`
+3. Open Chrome/Edge and navigate to `chrome://extensions/` (or `edge://extensions/`)
+4. Enable **Developer mode** (toggle in top right)
+5. Click **Load unpacked** and select `.output/chrome-mv3` or `.output/edge-mv3`
+6. Open a new tab to see traiex in action!
 
 ### Build for Distribution
 
-No build step required! This extension uses vanilla HTML, CSS, and JavaScript.
+traiex is now a WXT + Vue extension project. Build with `pnpm build` / `pnpm build:edge`, or create store archives with `pnpm zip` / `pnpm zip:edge`.
 
 ## Privacy
 
-- A privacy policy source page is included at `privacy.html`
+- A privacy policy source page is included at `public/privacy.html`
 
 ## ⚙️ Configuration
 
@@ -107,33 +108,24 @@ Click the **⚙️ Settings** button (bottom right corner) or right-click the ex
 
 ```
 traiex/
-├── assets/           # Search engine icons (SVG)
-├── css/
-│   ├── main.css      # Main page styles (imports others)
-│   ├── styles.css    # Core styling
-│   ├── vars.css      # CSS variables & themes
-│   ├── reset.css     # CSS reset
-│   ├── options.css   # Settings page styles
-│   └── privacy.css   # Privacy page styles
-├── js/
-│   ├── main.js       # Main page logic
-│   ├── options.js    # Settings page logic
-│   ├── data.js       # Default presets & bookmarks
-│   ├── utils.js      # Shared utilities & settings
-│   └── i18n.js       # Internationalization
-├── index.html        # New tab page
-├── options.html      # Settings page
-├── privacy.html      # Privacy policy page
-└── manifest.json     # Extension manifest (v3)
+├── entrypoints/
+│   ├── newtab/       # WXT new tab entrypoint
+│   └── options/      # WXT options entrypoint
+├── public/           # Icons, fonts, CSS, and privacy page copied to builds
+├── types/            # Shared types
+├── utils/            # Shared settings, storage, i18n, and search logic
+├── wxt.config.ts     # WXT manifest and browser-target config
+├── package.json
+└── pnpm-lock.yaml
 ```
 
 ## 🛠️ Tech Stack
 
-- **HTML5** - Semantic markup
-- **CSS3** - Custom properties, Flexbox, Grid, Media queries
-- **Vanilla JavaScript** - No frameworks, ES6+
-- **Chrome Extension Manifest V3**
-- **Chrome Storage Sync API** - Cross-device settings sync
+- **WXT** - Extension framework with multi-browser Manifest V3 builds
+- **Vue 3** - New tab and options UI
+- **TypeScript** - Shared types and behavior
+- **CSS3** - Existing custom properties, Flexbox, Grid, and media queries
+- **Chrome/Edge Storage Sync API** - Cross-device settings sync
 
 ## 📄 License
 
