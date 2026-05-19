@@ -6,7 +6,12 @@
   box-sizing: border-box;
 }
 
+html {
+  scrollbar-gutter: stable;
+}
+
 body {
+  overflow-y: scroll;
   background-color: var(--primary-background-color);
   color: var(--primary-font-color);
   font-family: var(--font-monospace);
@@ -396,20 +401,27 @@ select:focus {
 }
 
 .save-btn {
-  display: inline-flex;
+  display: inline-grid;
+  grid-auto-flow: column;
+  grid-auto-columns: max-content;
   align-items: center;
   justify-content: center;
-  gap: var(--spacing-s);
+  justify-items: center;
+  column-gap: var(--spacing-s);
   flex-shrink: 0;
-  min-height: 2.25rem;
-  padding: var(--spacing-s) var(--spacing-m);
+  min-width: 6.25rem;
+  min-height: 2.35rem;
+  padding: 0 var(--spacing-m);
   background-color: var(--primary-font-color);
   color: var(--primary-background-color);
   border: none;
-  border-radius: 0.35rem;
+  border-radius: 0.45rem;
   font-family: var(--font-monospace);
   font-size: 0.85rem;
   font-weight: 600;
+  line-height: 1;
+  text-align: center;
+  white-space: nowrap;
   cursor: pointer;
   transition: all 0.2s ease;
   box-shadow: 0 3px 10px rgba(0, 0, 0, 0.16);
@@ -421,13 +433,25 @@ select:focus {
   box-shadow: 0 5px 14px rgba(0, 0, 0, 0.24);
 }
 
+.save-btn .btn-text {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
 .save-btn .btn-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 0;
   opacity: 0;
   transform: scale(0);
   transition: all 0.2s ease;
 }
 
 .save-btn.saved .btn-icon {
+  width: 1em;
   opacity: 1;
   transform: scale(1);
 }

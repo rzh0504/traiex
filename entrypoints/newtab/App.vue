@@ -103,7 +103,29 @@
         :style="{ marginTop: settings.showDock ? '' : '2rem' }"
       >
         <h2 class="sr-only">Bookmarks</h2>
-        <ul v-for="(category, catIndex) in bookmarkCategories" :key="category.name" :data-cat-index="catIndex">
+        <div v-if="!hasBookmarks" class="bookmarks-empty-state">
+          <div class="bookmarks-empty-icon" aria-hidden="true">⌘</div>
+          <p class="bookmarks-empty-title">{{ emptyBookmarksTitle }}</p>
+          <p class="bookmarks-empty-description">{{ emptyBookmarksDescription }}</p>
+          <div class="bookmarks-empty-actions">
+            <a href="/options.html#bookmark-settings" class="bookmarks-empty-action">{{ emptyBookmarksAction }}</a>
+            <button
+              type="button"
+              class="bookmarks-empty-icon-action"
+              :title="hideBookmarksTitle"
+              :aria-label="hideBookmarksTitle"
+              @click="hideBookmarksSection"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M9.88 9.88a3 3 0 1 0 4.24 4.24"></path>
+                <path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68"></path>
+                <path d="M6.61 6.61A13.53 13.53 0 0 0 2 12s3 7 10 7a9.74 9.74 0 0 0 5.39-1.61"></path>
+                <line x1="2" y1="2" x2="22" y2="22"></line>
+              </svg>
+            </button>
+          </div>
+        </div>
+        <ul v-for="(category, catIndex) in bookmarkCategories" v-else :key="category.name" :data-cat-index="catIndex">
           <li v-if="category.name" class="category-header-item">{{ category.name }}</li>
           <li
             v-for="(bookmark, bmIndex) in category.bookmarks"
@@ -164,7 +186,7 @@
 import { computed, nextTick, onMounted, onUnmounted, reactive, ref, watch } from "vue";
 import type { BookmarkCategory, DockSite, Settings, SettingsStorage } from "../../types/settings";
 import { getDefaultSettings } from "../../types/settings";
-import { clone, defaultBookmarkCategories, defaultDockSites } from "../../utils/data";
+import { clone, defaultBookmarkCategories, defaultDockSites, removeLegacyPresetBookmarks } from "../../utils/data";
 import { escapeHtml, getFaviconUrl } from "../../utils/format";
 import type { SearchSuggestion } from "../../utils/edge-search";
 import { queryChromeDefaultSearch } from "../../utils/chrome-search";
@@ -212,6 +234,14 @@ const edgeSearchParam = computed(() => {
   return ({ google: "q", bing: "q", duckduckgo: "q", baidu: "wd" } as const)[settings.searchEngine ?? "google"];
 });
 
+const hasBookmarks = computed(() => bookmarkCategories.value.some((category) => category.bookmarks.length > 0));
+const emptyBookmarksTitle = computed(() => (settings.language === "en" ? "No bookmarks yet" : "还没有书签"));
+const emptyBookmarksDescription = computed(() =>
+  settings.language === "en" ? "Add your favorite links in settings." : "在设置中添加常用链接，它们会显示在这里。",
+);
+const emptyBookmarksAction = computed(() => (settings.language === "en" ? "Manage bookmarks" : "管理书签"));
+const hideBookmarksTitle = computed(() => (settings.language === "en" ? "Hide bookmarks bar" : "隐藏书签栏"));
+
 watch(
   () => [settings.theme, settings.lightBgColor, settings.bookmarksFontWeight, settings.language] as const,
   () => {
@@ -222,6 +252,11 @@ watch(
   },
   { immediate: true },
 );
+
+async function hideBookmarksSection(): Promise<void> {
+  settings.showBookmarks = false;
+  await appStorage.sync.set({ showBookmarks: false });
+}
 
 function updateDateTimeFormatters(locale: string): void {
   if (dateLocale === locale && timeFormatter && dateFormatter) return;
@@ -281,7 +316,7 @@ async function loadSettings(): Promise<void> {
     Object.assign(settings, { ...defaultSettings, ...result });
     dockSites.value = Array.isArray(result.dockSites) ? clone(result.dockSites) : clone(defaultDockSites);
     bookmarkCategories.value = Array.isArray(result.bookmarkCategories)
-      ? clone(result.bookmarkCategories)
+      ? removeLegacyPresetBookmarks(clone(result.bookmarkCategories))
       : clone(defaultBookmarkCategories);
   } catch (error) {
     console.error("Failed to load settings:", error);

@@ -375,10 +375,10 @@
 </template>
 
 <script setup lang="ts">
-import { computed, defineComponent, h, onMounted, reactive, ref, watch } from "vue";
+import { computed, defineComponent, h, onMounted, onUnmounted, reactive, ref, watch } from "vue";
 import type { BookmarkCategory, DockSite, Settings, SettingsStorage } from "../../types/settings";
 import { getDefaultSettings } from "../../types/settings";
-import { clone, defaultBookmarkCategories, defaultDockSites, dockSitePresets } from "../../utils/data";
+import { clone, defaultBookmarkCategories, defaultDockSites, dockSitePresets, removeLegacyPresetBookmarks } from "../../utils/data";
 import { getFaviconUrl, normalizeUrl } from "../../utils/format";
 import { createTranslator, type I18nKey } from "../../utils/i18n";
 import { appStorage } from "../../utils/storage";
@@ -455,6 +455,20 @@ function t(key: I18nKey, vars: Record<string, string | number> = {}): string {
   return activeTranslator.value(key, vars);
 }
 
+function syncActiveSectionFromHash(): void {
+  const hashSection = window.location.hash.slice(1);
+  const validSections = new Set([
+    "display-settings",
+    ...(isEdgeBuild ? ["search-settings"] : []),
+    "appearance-settings",
+    "dock-settings",
+    "bookmark-settings",
+    "data-settings",
+  ]);
+
+  if (validSections.has(hashSection)) activeSection.value = hashSection;
+}
+
 function ensureBookmarkDrafts(): void {
   bookmarkCategories.value.forEach((_, index) => {
     bookmarkDrafts[index] ??= { name: "", url: "" };
@@ -483,7 +497,7 @@ async function loadSettings(): Promise<void> {
 
     Object.assign(settings, { ...defaultSettings, ...result });
     bookmarkCategories.value = Array.isArray(result.bookmarkCategories)
-      ? clone(result.bookmarkCategories)
+      ? removeLegacyPresetBookmarks(clone(result.bookmarkCategories))
       : clone(defaultBookmarkCategories);
     currentDockSites.value = Array.isArray(result.dockSites) ? clone(result.dockSites) : clone(defaultDockSites);
     ensureBookmarkDrafts();
@@ -727,6 +741,12 @@ function hideBrokenImage(event: Event): void {
 }
 
 onMounted(() => {
+  syncActiveSectionFromHash();
+  window.addEventListener("hashchange", syncActiveSectionFromHash);
   void loadSettings();
+});
+
+onUnmounted(() => {
+  window.removeEventListener("hashchange", syncActiveSectionFromHash);
 });
 </script>

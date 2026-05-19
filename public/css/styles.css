@@ -477,6 +477,11 @@ aside svg {
   background-color: hsl(var(--color-theme-accent-hsl) / 0.35);
 }
 
+.theme-dark .bookmarks-empty-state {
+  border-color: hsl(var(--color-dracula-comment-hsl) / 0.35);
+  background: hsl(var(--color-dracula-current-line-hsl) / 0.18);
+}
+
 #bookmarks {
   align-items: flex-start;
   display: flex;
@@ -484,6 +489,115 @@ aside svg {
   justify-content: space-around;
   order: 3;
   gap: var(--spacing-m);
+}
+
+.bookmarks-empty-state {
+  position: relative;
+  width: min(100%, 28rem);
+  margin: var(--spacing-s) auto 0;
+  padding: var(--spacing-l);
+  border: 1px dashed hsl(var(--color-theme-dark-hsl) / 0.22);
+  border-radius: 0.9rem;
+  background: hsl(0 0% 100% / 0.22);
+  color: var(--primary-link-color);
+  text-align: center;
+  backdrop-filter: blur(8px);
+}
+
+.bookmarks-empty-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  margin-bottom: var(--spacing-s);
+  border-radius: 50%;
+  background: hsl(var(--color-theme-accent-hsl) / 0.12);
+  color: var(--color-theme-accent);
+  font-size: 1.25rem;
+  line-height: 1;
+}
+
+.bookmarks-empty-title {
+  margin: 0;
+  color: var(--primary-font-color);
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+.bookmarks-empty-description {
+  margin: var(--spacing-xs) auto 0;
+  max-width: 22rem;
+  color: var(--primary-link-color);
+  font-size: 0.8rem;
+  line-height: 1.6;
+}
+
+.bookmarks-empty-actions {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-s);
+  margin-top: var(--spacing-m);
+}
+
+.bookmarks-empty-action,
+.bookmarks-empty-icon-action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-theme-accent);
+  font-family: inherit;
+  font-size: 0.8rem;
+  text-decoration: none;
+  cursor: pointer;
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease,
+    color 0.2s ease,
+    opacity 0.2s ease,
+    transform 0.2s ease;
+}
+
+.bookmarks-empty-action {
+  min-height: 2.25rem;
+  padding: var(--spacing-s) var(--spacing-m);
+  border: 1px solid hsl(var(--color-theme-accent-hsl) / 0.45);
+  border-radius: 999px;
+}
+
+.bookmarks-empty-icon-action {
+  position: absolute;
+  top: var(--spacing-s);
+  right: var(--spacing-s);
+  width: 1.75rem;
+  height: 1.75rem;
+  padding: 0;
+  border: none;
+  background: transparent;
+  opacity: 0.72;
+}
+
+.bookmarks-empty-icon-action svg {
+  width: 0.9rem;
+  height: 0.9rem;
+}
+
+.bookmarks-empty-action:hover,
+.bookmarks-empty-action:focus-visible {
+  background: hsl(var(--color-theme-accent-hsl) / 0.12);
+  border-color: var(--color-theme-accent);
+  color: var(--primary-link-hover-color);
+  outline: none;
+  transform: translateY(-1px);
+}
+
+.bookmarks-empty-icon-action:hover,
+.bookmarks-empty-icon-action:focus-visible {
+  color: var(--primary-link-hover-color);
+  opacity: 1;
+  outline: none;
+  transform: translateY(-1px);
 }
 
 #bookmarks ul {
@@ -753,6 +867,11 @@ aside svg {
 
 .theme-dark #dock svg {
   fill: var(--color-dracula-purple);
+}
+
+.theme-dark .bookmarks-empty-state {
+  border-color: hsl(var(--color-dracula-comment-hsl) / 0.35);
+  background: hsl(var(--color-dracula-current-line-hsl) / 0.18);
 }
 
 /* Settings Button - Fixed Position Bottom Right */
