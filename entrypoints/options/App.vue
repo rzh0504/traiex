@@ -1,14 +1,27 @@
 <template>
   <main>
     <div class="settings-container">
-      <header>
-        <h1>traiex</h1>
-        <p class="subtitle">{{ t("settings_subtitle") }}</p>
-      </header>
+      <div class="settings-layout">
+        <aside class="settings-sidebar" aria-label="Settings navigation">
+          <nav class="settings-nav">
+            <a href="#display-settings" class="settings-nav-item" :class="{ active: activeSection === 'display-settings' }" @click.prevent="activeSection = 'display-settings'">{{ t("display") }}</a>
+            <a v-if="isEdgeBuild" href="#search-settings" class="settings-nav-item" :class="{ active: activeSection === 'search-settings' }" @click.prevent="activeSection = 'search-settings'">{{ t("search") }}</a>
+            <a href="#appearance-settings" class="settings-nav-item" :class="{ active: activeSection === 'appearance-settings' }" @click.prevent="activeSection = 'appearance-settings'">{{ t("appearance") }}</a>
+            <a href="#dock-settings" class="settings-nav-item" :class="{ active: activeSection === 'dock-settings' }" @click.prevent="activeSection = 'dock-settings'">{{ t("dock_settings") }}</a>
+            <a href="#bookmark-settings" class="settings-nav-item" :class="{ active: activeSection === 'bookmark-settings' }" @click.prevent="activeSection = 'bookmark-settings'">{{ t("bookmark_categories") }}</a>
+            <a href="#data-settings" class="settings-nav-item" :class="{ active: activeSection === 'data-settings' }" @click.prevent="activeSection = 'data-settings'">{{ t("data_management") }}</a>
+          </nav>
+        </aside>
 
-      <form id="settings-form" @submit.prevent="saveSettings">
-        <section class="settings-section">
-          <h2>{{ t("display") }}</h2>
+        <form id="settings-form" class="settings-content" @submit.prevent="saveSettings">
+          <section v-show="activeSection === 'display-settings'" id="display-settings" class="settings-section">
+            <div class="settings-section-header">
+              <h2>{{ t("display") }}</h2>
+              <button type="submit" class="save-btn">
+                <span class="btn-text">{{ t("save_settings") }}</span>
+                <span class="btn-icon">✓</span>
+              </button>
+            </div>
 
           <div class="setting-item">
             <div class="setting-info">
@@ -45,8 +58,14 @@
           </div>
         </section>
 
-        <section v-if="isEdgeBuild" class="settings-section">
-          <h2>{{ t("search") }}</h2>
+          <section v-if="isEdgeBuild" v-show="activeSection === 'search-settings'" id="search-settings" class="settings-section">
+            <div class="settings-section-header">
+              <h2>{{ t("search") }}</h2>
+              <button type="submit" class="save-btn">
+                <span class="btn-text">{{ t("save_settings") }}</span>
+                <span class="btn-icon">✓</span>
+              </button>
+            </div>
 
           <div class="setting-item">
             <div class="setting-info">
@@ -91,8 +110,14 @@
           </div>
         </section>
 
-        <section class="settings-section">
-          <h2>{{ t("appearance") }}</h2>
+          <section v-show="activeSection === 'appearance-settings'" id="appearance-settings" class="settings-section">
+            <div class="settings-section-header">
+              <h2>{{ t("appearance") }}</h2>
+              <button type="submit" class="save-btn">
+                <span class="btn-text">{{ t("save_settings") }}</span>
+                <span class="btn-icon">✓</span>
+              </button>
+            </div>
 
           <div class="setting-item">
             <div class="setting-info">
@@ -164,8 +189,14 @@
           </div>
         </section>
 
-        <section class="settings-section">
-          <h2>{{ t("dock_settings") }}</h2>
+          <section v-show="activeSection === 'dock-settings'" id="dock-settings" class="settings-section">
+            <div class="settings-section-header">
+              <h2>{{ t("dock_settings") }}</h2>
+              <button type="submit" class="save-btn">
+                <span class="btn-text">{{ t("save_settings") }}</span>
+                <span class="btn-icon">✓</span>
+              </button>
+            </div>
           <SettingToggle id="showDockLabels" v-model="settings.showDockLabels" :label="t('show_dock_labels')" :description="t('show_dock_labels_desc')" />
 
           <div class="setting-item">
@@ -215,8 +246,14 @@
           </div>
         </section>
 
-        <section class="settings-section">
-          <h2>{{ t("bookmark_categories") }}</h2>
+          <section v-show="activeSection === 'bookmark-settings'" id="bookmark-settings" class="settings-section">
+            <div class="settings-section-header">
+              <h2>{{ t("bookmark_categories") }}</h2>
+              <button type="submit" class="save-btn">
+                <span class="btn-text">{{ t("save_settings") }}</span>
+                <span class="btn-icon">✓</span>
+              </button>
+            </div>
 
           <div class="bookmark-categories" id="bookmark-categories">
             <div
@@ -300,16 +337,14 @@
           </div>
         </section>
 
-        <div class="actions">
-          <button type="submit" class="save-btn">
-            <span class="btn-text">{{ t("save_settings") }}</span>
-            <span class="btn-icon">✓</span>
-          </button>
-          <button type="button" class="reset-btn" id="reset-btn" @click="resetSettings">{{ t("reset_defaults") }}</button>
-        </div>
-
-        <section class="settings-section">
-          <h2>{{ t("data_management") }}</h2>
+          <section v-show="activeSection === 'data-settings'" id="data-settings" class="settings-section">
+            <div class="settings-section-header">
+              <h2>{{ t("data_management") }}</h2>
+              <button type="submit" class="save-btn">
+                <span class="btn-text">{{ t("save_settings") }}</span>
+                <span class="btn-icon">✓</span>
+              </button>
+            </div>
           <div class="setting-item">
             <div class="setting-info">
               <label>{{ t("import_export") }}</label>
@@ -322,7 +357,12 @@
             </div>
           </div>
         </section>
-      </form>
+
+        <div class="actions">
+          <button type="button" class="reset-btn" id="reset-btn" @click="resetSettings">{{ t("reset_defaults") }}</button>
+        </div>
+        </form>
+      </div>
     </div>
   </main>
 
@@ -390,6 +430,7 @@ const dockDragIndex = ref<number | null>(null);
 const dockDropIndex = ref<number | null>(null);
 const categoryDragIndex = ref<number | null>(null);
 const categoryDropIndex = ref<number | null>(null);
+const activeSection = ref("display-settings");
 
 const activeTranslator = computed(() => createTranslator(settings.language));
 const canDeleteCategory = computed(() => bookmarkCategories.value.length > MIN_CATEGORIES);
