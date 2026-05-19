@@ -382,7 +382,8 @@ select:focus {
   gap: var(--spacing-s);
 }
 
-.export-btn, .import-btn {
+.export-btn,
+.import-btn {
   padding: var(--spacing-s) var(--spacing-m);
   background: transparent;
   color: var(--primary-link-color);
@@ -394,7 +395,8 @@ select:focus {
   transition: all 0.2s ease;
 }
 
-.export-btn:hover, .import-btn:hover {
+.export-btn:hover,
+.import-btn:hover {
   border-color: var(--primary-font-color);
   color: var(--primary-font-color);
 }
@@ -675,11 +677,11 @@ select:focus {
   .add-bookmark-inline {
     flex-direction: column;
   }
-  
+
   .add-bookmark-inline .url-input {
     flex: 1;
   }
-  
+
   .bookmark-item .bookmark-url {
     display: none;
   }
@@ -688,17 +690,23 @@ select:focus {
 /* Dark mode select arrow */
 @media (prefers-color-scheme: dark) {
   select {
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath fill='%23999' d='M5 6L0 0h10z'/%3E%3C/svg%3E");
-    background-color: var(--color-black);
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath fill='%23BD93F9' d='M5 6L0 0h10z'/%3E%3C/svg%3E");
+    background-color: var(--color-dracula-current-line);
   }
 
   select option {
-    background-color: var(--color-black);
-    color: var(--color-white);
+    background-color: var(--color-dracula-background);
+    color: var(--color-dracula-foreground);
   }
-  
+
   .color-preset.selected::after {
     color: #fff;
+  }
+
+  .dock-site-item img.dock-icon {
+    filter: brightness(0) saturate(100%) invert(73%) sepia(57%) saturate(2737%)
+      hue-rotate(204deg) brightness(101%) contrast(95%);
+    opacity: 0.78;
   }
 }
 
@@ -742,7 +750,8 @@ select:focus {
   gap: var(--spacing-m);
 }
 
-.active-dock-sites, .preset-dock-sites {
+.active-dock-sites,
+.preset-dock-sites {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
   gap: var(--spacing-s);
@@ -804,7 +813,7 @@ select:focus {
   align-items: center;
   justify-content: center;
   font-size: 14px;
-   border: 2px solid var(--primary-background-color);
+  border: 2px solid var(--primary-background-color);
 }
 
 /* Drag and Drop States */
@@ -921,25 +930,52 @@ select:focus {
   --primary-font-color: var(--color-theme-dark);
   --primary-link-color: hsl(var(--color-theme-dark-hsl) / 0.7);
   --primary-link-hover-color: var(--color-theme-dark);
+  --color-theme-accent-hsl: 224 50% 55%;
+  --color-theme-accent: hsl(var(--color-theme-accent-hsl));
+  color-scheme: light;
 }
 
 :root.theme-dark {
-  --primary-background-color: var(--color-black);
-  --primary-font-color: var(--color-white);
-  --primary-link-color: hsl(var(--color-white-hsl) / 0.5);
-  --primary-link-hover-color: var(--color-white);
+  --primary-background-color: var(--color-dracula-background);
+  --primary-font-color: var(--color-dracula-foreground);
+  --primary-link-color: hsl(var(--color-dracula-purple-hsl) / 0.82);
+  --primary-link-hover-color: var(--color-dracula-foreground);
+  --color-theme-accent-hsl: var(--color-dracula-purple-hsl);
+  --color-theme-accent: var(--color-dracula-purple);
+  color-scheme: dark;
+}
+
+.theme-light select {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath fill='%23666' d='M5 6L0 0h10z'/%3E%3C/svg%3E");
+  background-color: hsl(0 0% 100% / 0.35);
+  color: var(--primary-font-color);
+}
+
+.theme-light select option {
+  background-color: var(--primary-background-color);
+  color: var(--primary-font-color);
+}
+
+.theme-light .color-preset.selected::after {
+  color: #333;
 }
 
 .theme-dark select {
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath fill='%23999' d='M5 6L0 0h10z'/%3E%3C/svg%3E");
-  background-color: var(--color-black);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath fill='%23BD93F9' d='M5 6L0 0h10z'/%3E%3C/svg%3E");
+  background-color: var(--color-dracula-current-line);
 }
 
 .theme-dark select option {
-  background-color: var(--color-black);
-  color: var(--color-white);
+  background-color: var(--color-dracula-background);
+  color: var(--color-dracula-foreground);
 }
 
 .theme-dark .color-preset.selected::after {
   color: #fff;
+}
+
+.theme-dark .dock-site-item img.dock-icon {
+  filter: brightness(0) saturate(100%) invert(73%) sepia(57%) saturate(2737%)
+    hue-rotate(204deg) brightness(101%) contrast(95%);
+  opacity: 0.78;
 }
