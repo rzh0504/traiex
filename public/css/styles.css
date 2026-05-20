@@ -486,9 +486,52 @@ aside svg {
   align-items: flex-start;
   display: flex;
   flex-direction: column;
-  justify-content: space-around;
+  justify-content: flex-start;
   order: 3;
   gap: var(--spacing-m);
+}
+
+#bookmarks.bookmark-layout-row {
+  align-items: stretch;
+  gap: var(--spacing-s);
+}
+
+#bookmarks.bookmark-layout-row ul {
+  display: grid;
+  grid-template-columns: repeat(
+    var(--bookmark-row-columns, 2),
+    minmax(0, var(--bookmark-row-item-max-width, 8rem))
+  );
+  gap: var(--spacing-xs) var(--spacing-s);
+  width: 100%;
+}
+
+#bookmarks.bookmark-layout-row li {
+  margin-bottom: 0;
+}
+
+#bookmarks.bookmark-layout-row .category-header-item {
+  flex: 0 0 100%;
+  margin-bottom: var(--spacing-xs);
+}
+
+#bookmarks.bookmark-layout-row li:not(.category-header-item) {
+  min-width: 0;
+  width: 100%;
+}
+
+#bookmarks.bookmark-layout-row a {
+  max-width: var(--bookmark-row-item-max-width, 8rem);
+  width: 100%;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+#bookmarks.bookmark-layout-row.bookmark-edit-mode ul {
+  min-height: 0;
+  padding-bottom: 0;
 }
 
 .bookmarks-empty-state {
@@ -702,7 +745,8 @@ aside svg {
   opacity: 0.8;
   background-color: hsl(var(--color-theme-accent-hsl) / 0.15) !important;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  transform: scale(1.02) !important;
+  animation: none !important;
+  transform: none !important;
   cursor: grabbing !important;
   z-index: 10;
 }
@@ -729,6 +773,26 @@ aside svg {
   border-radius: 2px;
   background: var(--color-theme-accent, #4a90d9);
   box-shadow: 0 0 6px var(--color-theme-accent, #4a90d9);
+}
+
+#bookmarks.bookmark-layout-row li.bm-drag-over-left::before,
+#bookmarks.bookmark-layout-row li.bm-drag-over-right::after {
+  content: "";
+  position: absolute;
+  top: 15%;
+  bottom: 15%;
+  width: 3px;
+  border-radius: 2px;
+  background: var(--color-theme-accent, #4a90d9);
+  box-shadow: 0 0 6px var(--color-theme-accent, #4a90d9);
+}
+
+#bookmarks.bookmark-layout-row li.bm-drag-over-left::before {
+  left: -2px;
+}
+
+#bookmarks.bookmark-layout-row li.bm-drag-over-right::after {
+  right: -2px;
 }
 
 #bookmarks ul.bm-drag-over-ul {
@@ -783,9 +847,19 @@ aside svg {
     padding: 0;
   }
 
-  #bookmarks {
+  #bookmarks.bookmark-layout-column {
     flex-direction: row;
     justify-content: space-between;
+  }
+
+  #bookmarks.bookmark-layout-row {
+    --bookmark-row-columns: 4;
+    flex-direction: column;
+    justify-content: flex-start;
+  }
+
+  #bookmarks.bookmark-layout-row .category-header-item {
+    grid-column: 1 / -1;
   }
 }
 

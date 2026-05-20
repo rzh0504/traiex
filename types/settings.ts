@@ -1,6 +1,7 @@
 export type Language = "zh-CN" | "en";
 export type ThemeMode = "auto" | "light" | "dark";
 export type LinkTarget = "_blank" | "_self";
+export type BookmarkLayout = "column" | "row";
 export type SearchEngineId = "google" | "bing" | "duckduckgo" | "baidu";
 
 export type DockSite = {
@@ -28,6 +29,7 @@ export type Settings = {
   lightBgColor: string;
   searchBorderRadius: number;
   bookmarksFontWeight: number;
+  bookmarkLayout: BookmarkLayout;
   linkTarget: LinkTarget;
   showDockLabels: boolean;
   language: Language;
@@ -51,6 +53,7 @@ export const defaultSettingsBase = {
   lightBgColor: "#DDE2EF",
   searchBorderRadius: 20,
   bookmarksFontWeight: 400,
+  bookmarkLayout: "column",
   linkTarget: "_blank",
   showDockLabels: false,
   language: "zh-CN",
@@ -61,7 +64,9 @@ export const edgeSettingsDefaults = {
   searchEngine: "google",
   saveSearchHistory: false,
   maxSearchHistory: 10,
-} satisfies Required<Pick<Settings, "searchEngine" | "saveSearchHistory" | "maxSearchHistory">>;
+} satisfies Required<
+  Pick<Settings, "searchEngine" | "saveSearchHistory" | "maxSearchHistory">
+>;
 
 export function getDefaultSettings(): Settings {
   if (import.meta.env.BROWSER === "edge") {

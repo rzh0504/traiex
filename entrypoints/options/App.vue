@@ -187,6 +187,17 @@
               <option :value="700">{{ t("font_bold") }} (700)</option>
             </select>
           </div>
+
+          <div class="setting-item">
+            <div class="setting-info">
+              <label for="bookmarkLayout">{{ t("bookmark_layout") }}</label>
+              <span class="setting-description">{{ t("bookmark_layout_desc") }}</span>
+            </div>
+            <select id="bookmarkLayout" v-model="settings.bookmarkLayout">
+              <option value="column">{{ t("bookmark_layout_column") }}</option>
+              <option value="row">{{ t("bookmark_layout_row") }}</option>
+            </select>
+          </div>
         </section>
 
           <section v-show="activeSection === 'dock-settings'" id="dock-settings" class="settings-section">
@@ -516,6 +527,7 @@ function buildSettingsPayload(): Record<string, unknown> {
     lightBgColor: settings.lightBgColor,
     searchBorderRadius: settings.searchBorderRadius,
     bookmarksFontWeight: settings.bookmarksFontWeight,
+    bookmarkLayout: settings.bookmarkLayout,
     linkTarget: settings.linkTarget,
     showDockLabels: settings.showDockLabels,
     language: settings.language,

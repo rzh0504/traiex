@@ -99,7 +99,10 @@
       <section
         id="bookmarks"
         v-show="settings.showBookmarks"
-        :class="{ 'bookmark-edit-mode': bookmarkEditMode }"
+        :class="[
+          `bookmark-layout-${settings.bookmarkLayout}`,
+          { 'bookmark-edit-mode': bookmarkEditMode },
+        ]"
         :style="{ marginTop: settings.showDock ? '' : '2rem' }"
       >
         <h2 class="sr-only">Bookmarks</h2>
@@ -139,6 +142,10 @@
                 bookmarkDrop?.catIndex === catIndex && bookmarkDrop.bmIndex === bmIndex && bookmarkDrop.side === 'top',
               'bm-drag-over-bottom':
                 bookmarkDrop?.catIndex === catIndex && bookmarkDrop.bmIndex === bmIndex && bookmarkDrop.side === 'bottom',
+              'bm-drag-over-left':
+                bookmarkDrop?.catIndex === catIndex && bookmarkDrop.bmIndex === bmIndex && bookmarkDrop.side === 'left',
+              'bm-drag-over-right':
+                bookmarkDrop?.catIndex === catIndex && bookmarkDrop.bmIndex === bmIndex && bookmarkDrop.side === 'right',
             }"
             @pointerdown="startBookmarkLongPress($event, catIndex, bmIndex)"
             @pointermove="moveBookmarkLongPress($event)"
@@ -223,7 +230,7 @@ let suppressDockClick = false;
 
 const bookmarkEditMode = ref(false);
 const bookmarkDrag = ref<{ catIndex: number; bmIndex: number } | null>(null);
-const bookmarkDrop = ref<{ catIndex: number; bmIndex: number; side: "top" | "bottom" } | null>(null);
+const bookmarkDrop = ref<{ catIndex: number; bmIndex: number; side: "top" | "bottom" | "left" | "right" } | null>(null);
 let bookmarkLongPressTimer: number | undefined;
 let bookmarkPointerStart: { x: number; y: number } | null = null;
 let suppressBookmarkClick = false;
@@ -480,7 +487,18 @@ function startBookmarkDrag(event: DragEvent, catIndex: number, bmIndex: number):
 function overBookmarkDrag(event: DragEvent, catIndex: number, bmIndex: number): void {
   if (!bookmarkDrag.value) return;
   const rect = (event.currentTarget as HTMLElement).getBoundingClientRect();
-  bookmarkDrop.value = { catIndex, bmIndex, side: event.clientY < rect.top + rect.height / 2 ? "top" : "bottom" };
+  bookmarkDrop.value = {
+    catIndex,
+    bmIndex,
+    side:
+      settings.bookmarkLayout === "row"
+        ? event.clientX < rect.left + rect.width / 2
+          ? "left"
+          : "right"
+        : event.clientY < rect.top + rect.height / 2
+          ? "top"
+          : "bottom",
+  };
 }
 
 async function dropBookmark(catIndex: number, bmIndex: number): Promise<void> {
@@ -494,7 +512,8 @@ async function dropBookmark(catIndex: number, bmIndex: number): Promise<void> {
   if (!moved) return;
   const sameCategory = drag.catIndex === catIndex;
   const adjustedIndex = sameCategory && drag.bmIndex < bmIndex ? bmIndex - 1 : bmIndex;
-  const insertIndex = bookmarkDrop.value?.side === "bottom" ? adjustedIndex + 1 : adjustedIndex;
+  const shouldInsertAfter = bookmarkDrop.value?.side === "bottom" || bookmarkDrop.value?.side === "right";
+  const insertIndex = shouldInsertAfter ? adjustedIndex + 1 : adjustedIndex;
   targetCategory.bookmarks.splice(insertIndex, 0, moved);
   bookmarkCategories.value = nextCategories;
   settings.bookmarkCategories = nextCategories;

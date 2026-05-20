@@ -38,6 +38,10 @@ const translations = {
     search_border_radius_desc: "调整搜索框的圆角大小",
     bookmarks_font_weight: "书签字体粗细",
     bookmarks_font_weight_desc: "调整书签链接的字体粗细",
+    bookmark_layout: "书签布局",
+    bookmark_layout_desc: "选择书签分类在主页上的排列方式",
+    bookmark_layout_column: "列布局",
+    bookmark_layout_row: "行布局",
     font_regular: "常规",
     font_medium: "中等",
     font_bold: "粗体",
@@ -142,6 +146,11 @@ const translations = {
     search_border_radius_desc: "Adjust search box border radius",
     bookmarks_font_weight: "Bookmark Font Weight",
     bookmarks_font_weight_desc: "Adjust bookmark link font weight",
+    bookmark_layout: "Bookmark Layout",
+    bookmark_layout_desc:
+      "Choose how bookmark categories are arranged on the home page",
+    bookmark_layout_column: "Columns",
+    bookmark_layout_row: "Rows",
     font_regular: "Regular",
     font_medium: "Medium",
     font_bold: "Bold",
@@ -162,7 +171,8 @@ const translations = {
     add_category: "Add Category",
     delete_category: "Delete Category",
     add_bookmark: "Add Bookmark",
-    delete_category_confirm: "Are you sure you want to delete this category? All bookmarks in it will be removed.",
+    delete_category_confirm:
+      "Are you sure you want to delete this category? All bookmarks in it will be removed.",
     category_limit_min: "Minimum 2 categories required",
     category_limit_max: "Maximum 4 categories allowed",
     new_category: "New Category",
@@ -211,7 +221,7 @@ const translations = {
   },
 } as const;
 
-export type I18nKey = keyof typeof translations["zh-CN"];
+export type I18nKey = keyof (typeof translations)["zh-CN"];
 
 export function createTranslator(language: Language) {
   return (key: I18nKey, vars: Record<string, string | number> = {}) => {
