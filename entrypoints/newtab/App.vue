@@ -128,7 +128,16 @@
             </button>
           </div>
         </div>
-        <ul v-for="(category, catIndex) in bookmarkCategories" v-else :key="category.name" :data-cat-index="catIndex">
+        <ul
+          v-for="(category, catIndex) in bookmarkCategories"
+          v-else
+          :key="category.name"
+          :data-cat-index="catIndex"
+          :class="{ 'bm-drag-over-ul': bookmarkCategoryDropIndex === catIndex }"
+          @dragover.prevent="overBookmarkCategoryDrag($event, catIndex)"
+          @dragleave="leaveBookmarkCategoryDrag($event, catIndex)"
+          @drop.prevent="dropBookmarkToCategory($event, catIndex)"
+        >
           <li v-if="category.name" class="category-header-item">{{ category.name }}</li>
           <li
             v-for="(bookmark, bmIndex) in category.bookmarks"
@@ -172,6 +181,15 @@
               />
               {{ bookmark.name }}
             </a>
+          </li>
+          <li
+            v-if="bookmarkEditMode && category.bookmarks.length === 0"
+            class="bookmark-empty-drop-zone"
+            :class="{ 'bm-drag-over-empty': bookmarkCategoryDropIndex === catIndex }"
+            @dragover.prevent="overBookmarkCategoryDrag($event, catIndex)"
+            @drop.prevent="dropBookmarkToCategory($event, catIndex)"
+          >
+            {{ emptyCategoryDropText }}
           </li>
         </ul>
       </section>
@@ -231,6 +249,7 @@ let suppressDockClick = false;
 const bookmarkEditMode = ref(false);
 const bookmarkDrag = ref<{ catIndex: number; bmIndex: number } | null>(null);
 const bookmarkDrop = ref<{ catIndex: number; bmIndex: number; side: "top" | "bottom" | "left" | "right" } | null>(null);
+const bookmarkCategoryDropIndex = ref<number | null>(null);
 let bookmarkLongPressTimer: number | undefined;
 let bookmarkPointerStart: { x: number; y: number } | null = null;
 let suppressBookmarkClick = false;
@@ -242,6 +261,7 @@ const edgeSearchParam = computed(() => {
 });
 
 const hasBookmarks = computed(() => bookmarkCategories.value.some((category) => category.bookmarks.length > 0));
+const emptyCategoryDropText = computed(() => (settings.language === "en" ? "Drop bookmark here" : "拖到这里"));
 const emptyBookmarksTitle = computed(() => (settings.language === "en" ? "No bookmarks yet" : "还没有书签"));
 const emptyBookmarksDescription = computed(() =>
   settings.language === "en" ? "Add your favorite links in settings." : "在设置中添加常用链接，它们会显示在这里。",
@@ -486,6 +506,7 @@ function startBookmarkDrag(event: DragEvent, catIndex: number, bmIndex: number):
 
 function overBookmarkDrag(event: DragEvent, catIndex: number, bmIndex: number): void {
   if (!bookmarkDrag.value) return;
+  bookmarkCategoryDropIndex.value = null;
   const rect = (event.currentTarget as HTMLElement).getBoundingClientRect();
   bookmarkDrop.value = {
     catIndex,
@@ -499,6 +520,45 @@ function overBookmarkDrag(event: DragEvent, catIndex: number, bmIndex: number): 
           ? "top"
           : "bottom",
   };
+}
+
+function overBookmarkCategoryDrag(event: DragEvent, catIndex: number): void {
+  if (!bookmarkDrag.value) return;
+
+  const target = event.target as HTMLElement | null;
+  if (target?.closest("[data-bm-index]")) return;
+
+  bookmarkDrop.value = null;
+  bookmarkCategoryDropIndex.value = catIndex;
+}
+
+function leaveBookmarkCategoryDrag(event: DragEvent, catIndex: number): void {
+  const currentTarget = event.currentTarget as HTMLElement;
+  const relatedTarget = event.relatedTarget as Node | null;
+  if (relatedTarget && currentTarget.contains(relatedTarget)) return;
+  if (bookmarkCategoryDropIndex.value === catIndex) bookmarkCategoryDropIndex.value = null;
+}
+
+async function dropBookmarkToCategory(event: DragEvent, catIndex: number): Promise<void> {
+  const drag = bookmarkDrag.value;
+  if (!drag) return;
+
+  const target = event.target as HTMLElement | null;
+  if (target?.closest("[data-bm-index]")) return;
+
+  const nextCategories = clone(bookmarkCategories.value);
+  const sourceCategory = nextCategories[drag.catIndex];
+  const targetCategory = nextCategories[catIndex];
+  if (!sourceCategory || !targetCategory) return;
+
+  const moved = sourceCategory.bookmarks.splice(drag.bmIndex, 1)[0];
+  if (!moved) return;
+
+  targetCategory.bookmarks.push(moved);
+  bookmarkCategories.value = nextCategories;
+  settings.bookmarkCategories = nextCategories;
+  await appStorage.sync.set({ bookmarkCategories: nextCategories });
+  endBookmarkDrag();
 }
 
 async function dropBookmark(catIndex: number, bmIndex: number): Promise<void> {
@@ -524,6 +584,7 @@ async function dropBookmark(catIndex: number, bmIndex: number): Promise<void> {
 function endBookmarkDrag(): void {
   bookmarkDrag.value = null;
   bookmarkDrop.value = null;
+  bookmarkCategoryDropIndex.value = null;
 }
 
 async function submitSearch(): Promise<void> {
