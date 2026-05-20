@@ -858,6 +858,33 @@ aside svg {
 }
 
 /* Responsive Media Queries */
+@media screen and (max-width: 47.999em) {
+  #bookmarks.bookmark-layout-row {
+    align-items: flex-start;
+    gap: var(--spacing-m);
+  }
+
+  #bookmarks.bookmark-layout-row ul {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    width: 100%;
+  }
+
+  #bookmarks.bookmark-layout-row li {
+    margin-bottom: var(--spacing-xs);
+  }
+
+  #bookmarks.bookmark-layout-row .category-header-item,
+  #bookmarks.bookmark-layout-row .bookmark-empty-drop-zone {
+    grid-column: auto;
+  }
+
+  #bookmarks.bookmark-layout-row .category-header-item {
+    margin-bottom: var(--spacing-s);
+  }
+}
+
 @media screen and (min-width: 48em) {
   header {
     display: flex;

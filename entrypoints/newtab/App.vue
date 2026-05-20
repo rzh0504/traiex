@@ -512,7 +512,7 @@ function overBookmarkDrag(event: DragEvent, catIndex: number, bmIndex: number): 
     catIndex,
     bmIndex,
     side:
-      settings.bookmarkLayout === "row"
+      settings.bookmarkLayout === "row" && window.matchMedia("(min-width: 48em)").matches
         ? event.clientX < rect.left + rect.width / 2
           ? "left"
           : "right"

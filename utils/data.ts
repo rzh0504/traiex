@@ -42,7 +42,7 @@ export const dockSitePresets: DockSite[] = [
   },
   {
     name: "Cloudflare",
-    url: "https://www.cloudflare.com",
+    url: "https://dash.cloudflare.com",
     icon: "/assets/preset_icons/cloudflare.svg",
   },
   { name: "X", url: "https://x.com", icon: "/assets/preset_icons/x.svg" },

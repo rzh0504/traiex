@@ -11,6 +11,7 @@ html {
 }
 
 body {
+  overflow-x: hidden;
   overflow-y: scroll;
   background-color: var(--primary-background-color);
   color: var(--primary-font-color);
@@ -823,24 +824,39 @@ select:focus {
 }
 
 @media screen and (max-width: 900px) {
+  main {
+    padding: var(--spacing-m);
+  }
+
+  .settings-container,
+  .settings-layout,
+  .settings-content {
+    min-width: 0;
+    max-width: 100%;
+  }
+
   .settings-layout {
-    grid-template-columns: 1fr;
-    gap: var(--spacing-l);
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--spacing-m);
   }
 
   .settings-sidebar {
     position: sticky;
     top: 0;
     z-index: 10;
-    margin: calc(var(--spacing-s) * -1) calc(var(--spacing-s) * -1) 0;
-    padding: var(--spacing-s);
+    margin: 0;
+    padding: var(--spacing-xs) 0;
+    max-width: 100%;
+    overflow: hidden;
     background: hsl(var(--color-theme-hsl) / 0.86);
     backdrop-filter: blur(12px);
   }
 
   .settings-nav {
     flex-direction: row;
+    max-width: 100%;
     overflow-x: auto;
+    overflow-y: hidden;
     scrollbar-width: none;
   }
 
@@ -860,16 +876,63 @@ select:focus {
 
 /* Responsive */
 @media screen and (max-width: 640px) {
+  html {
+    scrollbar-gutter: stable;
+  }
+
   main {
-    padding: var(--spacing-m);
+    display: block;
+    padding: 0;
   }
 
   .settings-container {
-    padding: var(--spacing-m) 0;
+    width: 100%;
+    max-width: 100%;
+    padding: 0;
+  }
+
+  .settings-layout {
+    gap: 0;
+  }
+
+  .settings-sidebar {
+    border-bottom: 1px solid hsl(var(--color-theme-dark-hsl) / 0.1);
+    padding: var(--spacing-xs) var(--spacing-s);
+  }
+
+  .settings-nav {
+    border-radius: 0.65rem;
+  }
+
+  .settings-nav-item {
+    min-height: 2.25rem;
+    padding: var(--spacing-xs) var(--spacing-s);
+    font-size: 0.82rem;
+  }
+
+  .settings-content {
+    padding: var(--spacing-m);
+  }
+
+  #settings-form {
+    gap: var(--spacing-m);
   }
 
   .settings-section {
+    gap: var(--spacing-s);
     padding: var(--spacing-m);
+    border-radius: 0.75rem;
+  }
+
+  .settings-section-header {
+    gap: var(--spacing-s);
+  }
+
+  .save-btn {
+    min-width: auto;
+    min-height: 2.15rem;
+    padding: 0 var(--spacing-s);
+    font-size: 0.78rem;
   }
 
   header h1 {
@@ -877,17 +940,38 @@ select:focus {
   }
 
   .setting-item {
+    width: 100%;
+    min-width: 0;
     flex-direction: column;
-    align-items: flex-start;
+    align-items: stretch;
     gap: var(--spacing-s);
   }
 
-  .toggle {
-    align-self: flex-end;
+  .setting-info {
+    width: 100%;
+    min-width: 0;
   }
 
-  select {
+  .toggle {
+    align-self: flex-start;
+  }
+
+  select,
+  .range-control,
+  .color-custom,
+  .import-export-btns {
     width: 100%;
+  }
+
+  .range-control,
+  .color-custom,
+  .import-export-btns {
+    flex-wrap: wrap;
+  }
+
+  .range-input {
+    flex: 1;
+    min-width: 0;
   }
 
   .actions {
