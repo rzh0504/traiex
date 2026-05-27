@@ -1,7 +1,5 @@
 # traiex
 
-![traiex](favicon-32x32.png?raw=true)
-
 > A minimal, beautiful, and customizable new tab page extension for Chrome/Edge browsers.
 
 > [中文文档](README_zh.md)
@@ -28,7 +26,7 @@
 
 | Dark Mode                                                                      | Light Mode                                                                       |
 | ------------------------------------------------------------------------------ | -------------------------------------------------------------------------------- |
-| ![Dark Mode](https://s3.hi168.com/hi168-25959-33617kcp/traiex/traiex-dark.png) | ![Light Mode](https://s3.hi168.com/hi168-25959-33617kcp/traiex/traiex-light.png) |
+| ![Dark Mode](https://s3.hi168.com/hi168-25959-33617kcp/traiex/traiex-dark.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Checksum-Mode=ENABLED&X-Amz-Credential=HIMK2LFRNUFDDI92PGI8%2F20260527%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20260527T090938Z&X-Amz-Expires=3600&X-Amz-SignedHeaders=host&response-content-disposition=attachment%3B%20filename%3D%22traiex-dark.png%22&x-id=GetObject&X-Amz-Signature=4c2d0b62f66a0f1189d2f886be2f7bb2d271563ad4ee7bc3451a28efd251bc76)| ![Light Mode](https://s3.hi168.com/hi168-25959-33617kcp/traiex/traiex-light.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Checksum-Mode=ENABLED&X-Amz-Credential=HIMK2LFRNUFDDI92PGI8%2F20260527%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20260527T090827Z&X-Amz-Expires=3600&X-Amz-SignedHeaders=host&response-content-disposition=attachment%3B%20filename%3D%22traiex-light.png%22&x-id=GetObject&X-Amz-Signature=529f2676e4200b37f2db94f4ce6152089a521a5b6943eda398a9049b3028331b) |
 
 ## 🚀 Installation
 
