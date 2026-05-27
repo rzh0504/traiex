@@ -1,0 +1,84 @@
+traiex Privacy Policy
+
+Last updated: 2026-05-27
+
+English
+
+Overview
+
+traiex is a browser new tab extension. It shows time and date, provides a search box, lets you manage quick links and bookmarks, and stores your preferences in browser storage.
+
+Data stored by the extension
+
+traiex stores settings, dock items, and bookmark categories in chrome.storage.sync so they can sync with your signed-in browser profile.
+
+traiex does not create an account, run its own backend, or upload your data to a traiex server.
+
+When data is sent to third parties
+
+In the Chrome build, when you submit a search, the text you enter is sent through the Chrome Search API to your current default search provider in Chrome.
+
+In the Edge build, when you submit a search, the text you enter is sent to the search provider you selected in extension settings.
+
+When bookmark favicons are displayed, the bookmark site is sent to Google's favicon service to request the icon image. If that request fails, the bookmark domain may be sent to DuckDuckGo's favicon service as a fallback.
+
+External websites that you open from quick links, bookmarks, or search results receive the normal browser request for that page.
+
+Permissions
+
+storage is used to save settings, dock items, and bookmark categories in browser storage.
+
+search is declared only by the Chrome build and is used only to submit the user's typed query from the new tab search box through Chrome's Search API, so the extension respects the user's current default search provider.
+
+Data sharing and selling
+
+traiex does not sell your personal data. It does not share your data with data brokers. Data is only sent to third-party services when the feature requires it, as described above.
+
+Your choices
+
+You can remove synced settings by resetting the extension or uninstalling it from your browser.
+
+Contact
+
+milanpublics@gmail.com
+
+
+中文
+
+概述
+
+traiex 是一个浏览器新标签页扩展。它会显示时间和日期，提供搜索框，支持管理快捷链接和书签，并把你的偏好设置保存在浏览器存储中。
+
+扩展会存储哪些数据
+
+traiex 会把设置项、Dock 站点和书签分类保存在 chrome.storage.sync 中，以便跟随已登录的浏览器账号同步。
+
+traiex 不会创建自己的账号体系，不运行自建后端，也不会把你的数据上传到 traiex 服务器。
+
+什么时候会向第三方发送数据
+
+在 Chrome 构建中，当你提交搜索时，你输入的搜索词会通过 Chrome Search API 发送给 Chrome 当前默认搜索提供商。
+
+在 Edge 构建中，当你提交搜索时，你输入的搜索词会发送给你在扩展设置中选择的搜索提供商。
+
+当页面显示书签 favicon 时，书签网站会发送到 Google 的 favicon 服务，用于请求图标图片。如果请求失败，书签域名可能会发送到 DuckDuckGo 的 favicon 服务作为兜底。
+
+当你从 Dock、书签或搜索结果打开外部网站时，目标网站会收到正常的浏览器访问请求。
+
+扩展权限
+
+storage 权限用于保存设置、Dock 站点和书签分类。
+
+search 权限仅由 Chrome 构建声明，只用于从新标签页搜索框提交用户主动输入的查询，并通过 Chrome Search API 遵循用户当前默认搜索设置。
+
+数据共享与出售
+
+traiex 不会出售你的个人数据，也不会把你的数据分享给数据经纪商。只有在功能本身需要时，相关数据才会发送给上面列出的第三方服务。
+
+你的可控项
+
+你可以通过重置扩展设置或卸载扩展来移除相关数据。
+
+联系信息
+
+milanpublics@gmail.com

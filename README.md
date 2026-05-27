@@ -47,7 +47,7 @@ traiex is now a WXT + Vue extension project. Build with `pnpm build` / `pnpm bui
 
 ## Privacy
 
-- A privacy policy source page is included at `public/privacy.html`
+- Privacy policy text for Google Docs is available at `docs/privacy-policy-google-docs.txt`
 
 ## ⚙️ Configuration
 
@@ -111,7 +111,7 @@ traiex/
 ├── entrypoints/
 │   ├── newtab/       # WXT new tab entrypoint
 │   └── options/      # WXT options entrypoint
-├── public/           # Icons, fonts, CSS, and privacy page copied to builds
+├── public/           # Icons, fonts, and CSS copied to builds
 ├── types/            # Shared types
 ├── utils/            # Shared settings, storage, i18n, and search logic
 ├── wxt.config.ts     # WXT manifest and browser-target config

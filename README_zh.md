@@ -47,7 +47,7 @@
 
 ## 隐私政策
 
-- 仓库已提供隐私政策源文件：`public/privacy.html`
+- 适合复制到 Google Docs 的隐私政策文本位于：`docs/privacy-policy-google-docs.txt`
 
 ## ⚙️ 设置选项
 
@@ -111,7 +111,7 @@ traiex/
 ├── entrypoints/
 │   ├── newtab/       # WXT 新标签页入口
 │   └── options/      # WXT 设置页入口
-├── public/           # 构建时原样复制的图标、字体、CSS、隐私页
+├── public/           # 构建时原样复制的图标、字体和 CSS
 ├── types/            # 共享类型
 ├── utils/            # 设置、存储、i18n、搜索等共享逻辑
 ├── wxt.config.ts     # WXT manifest 与多浏览器配置

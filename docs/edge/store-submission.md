@@ -7,7 +7,7 @@
 - Visibility: `Public` for normal release, `Hidden` if you want to test by direct link first
 - Website URL: your project homepage or repo homepage
 - Support contact details: `mailto:milanpublics@gmail.com`
-- Privacy policy URL: host `privacy.html` on a public URL and fill that URL in Partner Center
+- Privacy policy URL: publish `docs/privacy-policy-google-docs.txt` through Google Docs and fill that public URL in Partner Center
 
 ## Short Description
 
