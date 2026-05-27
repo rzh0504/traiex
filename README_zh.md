@@ -135,6 +135,6 @@ MIT 许可证 - 可自由使用、修改和分发。
 
 - 原始项目 [Tressley/\_traichu](https://github.com/Tressley/_traichu)
 - 字体：[Fira Code](https://fonts.google.com/specimen/Fira+Code)（通过 Google Fonts）
-- Favicon 服务：[DuckDuckGo Icons API](https://icons.duckduckgo.com)
+- Favicon 服务：[Google Favicon API](https://t0.gstatic.com/faviconV2)，并使用 [DuckDuckGo Icons API](https://icons.duckduckgo.com) 兜底
 - 图标：来自 [Simple Icons](https://simpleicons.org/) 的内联 SVG
 - 社区支持：[Linux.do](https://linux.do/)

@@ -304,7 +304,7 @@
               <div class="category-bookmarks" :data-cat-index="catIndex">
                 <div v-if="category.bookmarks.length === 0" class="bookmarks-empty">{{ t("no_bookmarks") }}</div>
                 <div v-for="(bookmark, bookmarkIndex) in category.bookmarks" :key="bookmark.url" class="bookmark-item">
-                  <img class="favicon" :src="getFaviconUrl(bookmark.url)" alt="" @error="hideBrokenImage" />
+                  <img class="favicon" :src="getFaviconUrl(bookmark.url)" alt="" @error="handleFaviconError($event, bookmark.url)" />
                   <span class="bookmark-name">{{ bookmark.name }}</span>
                   <span class="bookmark-url">{{ bookmark.url }}</span>
                   <button
@@ -390,7 +390,7 @@ import { computed, defineComponent, h, onMounted, onUnmounted, reactive, ref, wa
 import type { BookmarkCategory, DockSite, Settings, SettingsStorage } from "../../types/settings";
 import { getDefaultSettings } from "../../types/settings";
 import { clone, defaultBookmarkCategories, defaultDockSites, dockSitePresets, removeLegacyPresetBookmarks } from "../../utils/data";
-import { getFaviconUrl, normalizeUrl } from "../../utils/format";
+import { getDuckDuckGoFaviconUrl, getFaviconUrl, normalizeUrl } from "../../utils/format";
 import { createTranslator, type I18nKey } from "../../utils/i18n";
 import { appStorage } from "../../utils/storage";
 import { applyTheme } from "../../utils/theme";
@@ -748,8 +748,15 @@ function toastIcon(type: Toast["type"]): string {
   return "✓";
 }
 
-function hideBrokenImage(event: Event): void {
-  (event.currentTarget as HTMLImageElement).style.display = "none";
+function handleFaviconError(event: Event, url: string): void {
+  const image = event.currentTarget as HTMLImageElement;
+  const fallbackUrl = getDuckDuckGoFaviconUrl(url);
+  if (fallbackUrl && image.dataset.faviconFallback !== "duckduckgo") {
+    image.dataset.faviconFallback = "duckduckgo";
+    image.src = fallbackUrl;
+    return;
+  }
+  image.style.display = "none";
 }
 
 onMounted(() => {

@@ -135,6 +135,6 @@ MIT License - Feel free to use, modify, and distribute.
 
 - Original project [Tressley/\_traichu](https://github.com/Tressley/_traichu)
 - Font: [Fira Code](https://fonts.google.com/specimen/Fira+Code) via Google Fonts
-- Favicon service: [DuckDuckGo Icons API](https://icons.duckduckgo.com)
+- Favicon service: [Google Favicon API](https://t0.gstatic.com/faviconV2) with [DuckDuckGo Icons API](https://icons.duckduckgo.com) fallback
 - Icons: Inline SVGs from [Simple Icons](https://simpleicons.org/)
 - Community Support: [Linux.do](https://linux.do/)

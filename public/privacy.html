@@ -84,8 +84,10 @@
               sent to the search provider you selected in extension settings.
             </li>
             <li>
-              When bookmark favicons are displayed, the bookmark domain is sent
-              to DuckDuckGo's favicon service to request the icon image.
+              When bookmark favicons are displayed, the bookmark site is sent
+              to Google's favicon service to request the icon image. If that
+              request fails, the bookmark domain may be sent to DuckDuckGo's
+              favicon service as a fallback.
             </li>
             <li>
               External websites that you open from quick links, bookmarks, or
@@ -171,7 +173,7 @@
               在 Edge 构建中，当你提交搜索时，你输入的搜索词会发送给你在扩展设置中选择的搜索提供商。
             </li>
             <li>
-              当页面显示书签 favicon 时，书签域名会发送到 DuckDuckGo 的 favicon 服务，用于请求图标图片。
+              当页面显示书签 favicon 时，书签网站会发送到 Google 的 favicon 服务，用于请求图标图片。如果请求失败，书签域名可能会发送到 DuckDuckGo 的 favicon 服务作为兜底。
             </li>
             <li>
               当你从 Dock、书签或搜索结果打开外部网站时，目标网站会收到正常的浏览器访问请求。

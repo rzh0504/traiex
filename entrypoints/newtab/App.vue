@@ -177,7 +177,7 @@
                 :alt="`${bookmark.name} favicon`"
                 loading="lazy"
                 decoding="async"
-                @error="hideBrokenImage"
+                @error="handleFaviconError($event, bookmark.url)"
               />
               {{ bookmark.name }}
             </a>
@@ -212,7 +212,7 @@ import { computed, nextTick, onMounted, onUnmounted, reactive, ref, watch } from
 import type { BookmarkCategory, DockSite, Settings, SettingsStorage } from "../../types/settings";
 import { getDefaultSettings } from "../../types/settings";
 import { clone, defaultBookmarkCategories, defaultDockSites, removeLegacyPresetBookmarks } from "../../utils/data";
-import { escapeHtml, getFaviconUrl } from "../../utils/format";
+import { escapeHtml, getDuckDuckGoFaviconUrl, getFaviconUrl } from "../../utils/format";
 import type { SearchSuggestion } from "../../utils/edge-search";
 import { queryChromeDefaultSearch } from "../../utils/chrome-search";
 import { appStorage } from "../../utils/storage";
@@ -671,8 +671,15 @@ function highlightSuggestion(suggestion: SearchSuggestion): string {
   return `${before}<mark class="search-match">${match}</mark>${after}`;
 }
 
-function hideBrokenImage(event: Event): void {
-  (event.currentTarget as HTMLImageElement).style.display = "none";
+function handleFaviconError(event: Event, url: string): void {
+  const image = event.currentTarget as HTMLImageElement;
+  const fallbackUrl = getDuckDuckGoFaviconUrl(url);
+  if (fallbackUrl && image.dataset.faviconFallback !== "duckduckgo") {
+    image.dataset.faviconFallback = "duckduckgo";
+    image.src = fallbackUrl;
+    return;
+  }
+  image.style.display = "none";
 }
 
 function handleGlobalClick(event: MouseEvent): void {
