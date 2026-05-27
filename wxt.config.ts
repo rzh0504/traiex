@@ -4,7 +4,7 @@ export default defineConfig({
   modules: ["@wxt-dev/module-vue"],
   manifest: ({ browser }) => ({
     name: "traiex",
-    version: "1.1.0",
+    version: "2.0.0",
     description:
       browser === "edge"
         ? "Minimal Microsoft Edge new tab page with search, bookmarks, quick links, themes, and syncable settings."
