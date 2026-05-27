@@ -34,19 +34,20 @@
 
 ### 从源码安装（开发者模式）
 
-1. 克隆或下载此仓库
-2. 打开 Chrome/Edge 浏览器，进入 `chrome://extensions/`（或 `edge://extensions/`）
-3. 开启右上角的**开发者模式**
-4. 点击**加载已解压的扩展程序**，选择 `traiex` 文件夹
-5. 打开新标签页即可看到 traiex！
+1. 克隆此仓库并安装依赖：`pnpm install`
+2. 构建目标浏览器产物：Chrome 使用 `pnpm build`，Edge 使用 `pnpm build:edge`
+3. 打开 Chrome/Edge 浏览器，进入 `chrome://extensions/`（或 `edge://extensions/`）
+4. 开启右上角的**开发者模式**
+5. 点击**加载已解压的扩展程序**，选择 `.output/chrome-mv3` 或 `.output/edge-mv3`
+6. 打开新标签页即可看到 traiex！
 
 ### 发布版本
 
-无需构建！本扩展使用原生 HTML、CSS 和 JavaScript。
+本扩展已迁移为 WXT + Vue 工程。发布前请使用 `pnpm build` / `pnpm build:edge` 构建，或使用 `pnpm zip` / `pnpm zip:edge` 生成提交包。
 
 ## 隐私政策
 
-- 仓库已提供隐私政策源文件：`privacy.html`
+- 仓库已提供隐私政策源文件：`public/privacy.html`
 
 ## ⚙️ 设置选项
 
@@ -107,33 +108,24 @@
 
 ```
 traiex/
-├── assets/           # 搜索引擎图标 (SVG)
-├── css/
-│   ├── main.css      # 主页样式（导入其他文件）
-│   ├── styles.css    # 核心样式
-│   ├── vars.css      # CSS 变量和主题
-│   ├── reset.css     # CSS 重置
-│   ├── options.css   # 设置页样式
-│   └── privacy.css   # 隐私页样式
-├── js/
-│   ├── main.js       # 主页逻辑
-│   ├── options.js    # 设置页逻辑
-│   ├── data.js       # 默认预设和书签
-│   ├── utils.js      # 共享工具函数和设置
-│   └── i18n.js       # 国际化
-├── index.html        # 新标签页
-├── options.html      # 设置页面
-├── privacy.html      # 隐私政策页面
-└── manifest.json     # 扩展清单 (v3)
+├── entrypoints/
+│   ├── newtab/       # WXT 新标签页入口
+│   └── options/      # WXT 设置页入口
+├── public/           # 构建时原样复制的图标、字体、CSS、隐私页
+├── types/            # 共享类型
+├── utils/            # 设置、存储、i18n、搜索等共享逻辑
+├── wxt.config.ts     # WXT manifest 与多浏览器配置
+├── package.json
+└── pnpm-lock.yaml
 ```
 
 ## 🛠️ 技术栈
 
-- **HTML5** - 语义化标记
-- **CSS3** - CSS 自定义属性、Flexbox、Grid、媒体查询
-- **原生 JavaScript** - 无框架，ES6+
-- **Chrome Extension Manifest V3**
-- **Chrome Storage Sync API** - 跨设备设置同步
+- **WXT** - 工程化扩展框架，多浏览器 Manifest V3 构建
+- **Vue 3** - 新标签页和设置页 UI
+- **TypeScript** - 共享类型和业务逻辑
+- **CSS3** - 复用原有 CSS 自定义属性、Flexbox、Grid、媒体查询
+- **Chrome/Edge Storage Sync API** - 跨设备设置同步
 
 ## 📄 许可证
 

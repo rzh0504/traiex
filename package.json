@@ -1,0 +1,26 @@
+{
+  "name": "traiex",
+  "version": "1.1.0",
+  "description": "Minimal browser new tab page with search, bookmarks, quick links, themes, and syncable settings.",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "dev": "wxt",
+    "dev:edge": "wxt -b edge",
+    "build": "wxt build",
+    "build:edge": "wxt build -b edge",
+    "zip": "wxt zip",
+    "zip:edge": "wxt zip -b edge",
+    "typecheck": "vue-tsc --noEmit",
+    "postinstall": "wxt prepare"
+  },
+  "dependencies": {
+    "vue": "^3.5.0"
+  },
+  "devDependencies": {
+    "@wxt-dev/module-vue": "^1.0.0",
+    "typescript": "^5.8.0",
+    "vue-tsc": "^2.2.0",
+    "wxt": "^0.20.0"
+  }
+}
